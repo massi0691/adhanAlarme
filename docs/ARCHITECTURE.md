@@ -199,3 +199,59 @@ audio/notifications) restent `Sendable`. Les délégués ObjC
 (Core Location, MapKit) utilisent le motif `nonisolated` + relais
 `Task { @MainActor in }` avec extraction préalable de valeurs
 `Sendable` (pas de capture d'objets non-`Sendable`).
+
+## 9. Moteur audio (phase 3)
+
+### 9.1 Chaîne de résolution
+- Ordre : fichier bundle (`Resources/Adhan/`) → cache
+  `Application Support/Adhan/` (exclu sauvegarde) → téléchargement
+  explicite depuis `Muezzin.remoteURL` (`nil` = bundle uniquement).
+- `MuezzinAudioStore` (protocole) / `FileSystemMuezzinAudioStore` :
+  `availability()`, `localURL()`, `download()` (`AsyncThrowingStream`
+  0.0 → 1.0, écriture par blocs 64 Ko + fichier `.part` + déplacement
+  atomique), `deleteDownload()` (jamais le bundle, idempotent).
+- Téléchargement au premier plan en v1 (pas de session d'arrière-plan ;
+  fichiers de quelques Mo, app ouverte pendant le transfert).
+
+### 9.2 Lecture (`AVPlayerAdhanPlaybackService`, `@MainActor`, `@Observable`)
+- Session `.playback` + `.spokenAudio` (voix ; Bluetooth A2DP/AirPlay
+  système). Validation `asset.load(.isPlayable)` (+ `.duration` pour
+  Now Playing) avant activation de la session.
+- Interruptions (appels/Siri) : pause + reprise si `.shouldResume` ;
+  débranchement casque : pause (jamais de haut-parleur surprise).
+- Fin/échec d'item → `stopped` + désactivation polie
+  (`.notifyOthersOnDeactivation`). Observateurs app-lifetime, `[weak self]`.
+- État observé en direct par Réglages (`playbackState`).
+
+### 9.3 Arrière-plan et verrouillage
+- Capacité `audio` (`INFOPLIST_KEY_UIBackgroundModes`, build setting).
+- `AdhanNowPlayingController` : titre localisé (`audio.nowPlayingTitle`),
+  play/pause/toggle (casque, CarPlay). Info statique en v1 (pas de
+  progression temps réel). Fabrique pure `AdhanNowPlayingInfo` (testée).
+
+### 9.4 Interface Réglages
+- Feuille depuis l'accueil (remplace le placeholder) : section voix —
+  sélection persistée (`selectedMuezzinID`), statuts
+  (incluse/téléchargée/à télécharger/indisponible), téléchargement avec
+  progression, suppression, aperçu lecture/pause/reprise/arrêt.
+- Erreurs → clés localisées (`audio.error.*`, 6 cas + statuts).
+
+### 9.5 Tests
+- `AdhanNowPlayingInfoTests` (fabrique pure),
+  `FileSystemMuezzinAudioStoreTests` (cache isolé, `Bundle(url:)` pour
+  le bundle, échec réseau déterministe via port local fermé),
+  `AVPlayerAdhanPlaybackServiceTests` (moteur réel, WAV silencieux
+  synthétisé en code, interruptions/routes postées),
+  `SettingsViewModelTests` (doublures, persistance vérifiée par relecture).
+- `AdhanNowPlayingController` : câblage fin non testé (effets MediaPlayer).
+
+### 9.6 Recette manuelle
+- Audio de test : déposer n'importe quel MP3 renommé `makkah.mp3` dans
+  `Resources/Adhan/` (valide le moteur, pas un vrai Adhan), ou renseigner
+  `remoteURL` puis télécharger depuis Réglages.
+- Écouter (haut-parleur), pause/reprise/arrêt ; passer en arrière-plan
+  puis verrouiller → poursuite + titre sur l'écran verrouillé.
+- Appel entrant (second téléphone) → pause + reprise auto.
+- Bluetooth (enceinte/AirPods) : routage auto ; déconnexion → pause.
+- Casque débranché → pause, pas de haut-parleur surprise.
+- Voix non disponible → message clair (jamais de crash).
