@@ -195,4 +195,65 @@ struct SettingsViewModelTests {
         #expect(store.deletedIDs == ["makkah"])
         #expect(world.viewModel.playbackState == .stopped)
     }
+
+    @Test func enableAlertsGrantsAndSchedules() async {
+        guard let world = makeWorld() else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        await world.viewModel.enableAlerts()
+        #expect(world.viewModel.alertsEnabled == true)
+        #expect(world.alerts.scheduled.count == 1)
+        guard let batch = world.alerts.scheduled.first else {
+            #expect(Bool(false), "aucune planification")
+            return
+        }
+        #expect(batch.allSatisfy { $0.fireDate > Date() })
+        #expect((30...42).contains(batch.count))
+    }
+
+    @Test func enableAlertsDeniedKeepsDisabled() async {
+        let alerts = MockAlertService()
+        alerts.status = .denied
+        guard let world = makeWorld(alerts: alerts) else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        await world.viewModel.enableAlerts()
+        #expect(world.viewModel.alertsEnabled == false)
+        #expect(world.alerts.scheduled.isEmpty)
+        #expect(world.viewModel.alertAuthorization == .denied)
+    }
+
+    @Test func disableAlertsCancelsThroughEmptySchedule() async {
+        guard let world = makeWorld() else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        world.viewModel.disableAlerts()
+        for _ in 0..<100 {
+            if !world.alerts.scheduled.isEmpty { break }
+            try? await Task.sleep(nanoseconds: 10_000_000)
+        }
+        #expect(world.alerts.scheduled.count == 1)
+        #expect(world.alerts.scheduled.first?.isEmpty == true)
+    }
+
+    @Test func setAlertModeUpdatesSettingsAndReschedules() async {
+        guard let world = makeWorld() else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        world.viewModel.setAlertMode(.silent, for: .fajr)
+        #expect(world.viewModel.alertModes[.fajr] == .silent)
+        for _ in 0..<100 {
+            if !world.alerts.scheduled.isEmpty { break }
+            try? await Task.sleep(nanoseconds: 10_000_000)
+        }
+        guard let batch = world.alerts.scheduled.first else {
+            #expect(Bool(false), "aucune replanification")
+            return
+        }
+        #expect(!batch.contains { $0.prayer == .fajr })
+    }
 }
