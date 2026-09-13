@@ -6,7 +6,7 @@ enum DSTypography {
     static let greeting: Font = .title2.weight(.semibold)
     static let city: Font = .subheadline
     static let nextPrayerName: Font = .largeTitle.weight(.bold)
-    static let nextPrayerTime: Font = .extraLargeTitle.weight(.bold)
+    static let nextPrayerTime: Font = .largeTitle.weight(.bold)
     static let countdown: Font = .title2.monospacedDigit().weight(.semibold)
     static let prayerName: Font = .body.weight(.medium)
     static let prayerArabicName: Font = .subheadline

@@ -31,8 +31,8 @@ struct PrayerTimesTests {
     @Test func orderedTimes_areChronological() async throws {
         let ordered = fixture().orderedTimes
 
-        #expect(ordered.map(\.prayer) == Prayer.allCases)
-        let dates = ordered.map(\.date)
+        #expect(ordered.map { $0.prayer } == Prayer.allCases)
+        let dates = ordered.map { $0.date }
         #expect(dates == dates.sorted())
     }
 

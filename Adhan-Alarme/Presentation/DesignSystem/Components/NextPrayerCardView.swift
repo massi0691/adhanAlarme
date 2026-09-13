@@ -16,6 +16,7 @@ struct NextPrayerCardView: View {
 
             Text(nextPrayer.date, style: .time)
                 .font(DSTypography.nextPrayerTime)
+                .fontDesign(.rounded)
 
             HStack(spacing: DSSpacing.xs) {
                 Text("home.in")
