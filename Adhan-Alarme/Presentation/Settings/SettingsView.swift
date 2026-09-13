@@ -14,21 +14,21 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("settings.language.section") {
+                Section(header: { sectionHeader("settings.language.section", icon: "globe") }) {
                     Picker("settings.language.language", selection: languageBinding()) {
                         ForEach(AppLanguage.allCases, id: \.self) { language in
                             Text(LocalizedStringKey(language.titleKey)).tag(language)
                         }
                     }
                 }
-                Section("settings.appearance.section") {
+                Section(header: { sectionHeader("settings.appearance.section", icon: "circle.lefthalf.filled") }) {
                     Picker("settings.appearance.appearance", selection: appearanceBinding()) {
                         ForEach(AppAppearance.allCases, id: \.self) { appearance in
                             Text(LocalizedStringKey(appearance.titleKey)).tag(appearance)
                         }
                     }
                 }
-                Section("settings.calculation.section") {
+                Section(header: { sectionHeader("settings.calculation.section", icon: "function") }) {
                     Picker("settings.calculation.method", selection: methodBinding()) {
                         ForEach(CalculationMethod.allCases, id: \.self) { method in
                             Text(LocalizedStringKey(method.titleKey)).tag(method)
@@ -70,7 +70,7 @@ struct SettingsView: View {
                         CalculationAdjustmentsView(viewModel: viewModel)
                     }
                 }
-                Section("settings.alerts.section") {
+                Section(header: { sectionHeader("settings.alerts.section", icon: "bell") }) {
                     Toggle("settings.alerts.enabled", isOn: Binding(
                         get: { viewModel.alertsEnabled },
                         set: { enabled in
@@ -90,9 +90,16 @@ struct SettingsView: View {
                         }
                     } else if viewModel.alertsEnabled {
                         ForEach(Prayer.allCases) { prayer in
-                            Picker(LocalizedStringKey(prayer.titleKey), selection: modeBinding(for: prayer)) {
+                            Picker(selection: modeBinding(for: prayer)) {
                                 ForEach(PrayerAlertMode.allCases, id: \.self) { mode in
                                     Text(LocalizedStringKey(mode.labelKey)).tag(mode)
+                                }
+                            } label: {
+                                Label {
+                                    Text(LocalizedStringKey(prayer.titleKey))
+                                } icon: {
+                                    Image(systemName: prayer.iconName)
+                                        .foregroundStyle(DSColors.brand)
                                 }
                             }
                         }
@@ -114,7 +121,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-                Section("settings.voice.section") {
+                Section(header: { sectionHeader("settings.voice.section", icon: "speaker.wave.2") }) {
                     ForEach(viewModel.voices) { muezzin in
                         voiceRow(muezzin)
                     }
@@ -198,6 +205,16 @@ struct SettingsView: View {
             .disabled(viewModel.downloadProgress[muezzin.id] != nil)
         case .bundled, .unavailable, nil:
             EmptyView()
+        }
+    }
+
+    /// En-tête de section : titre secondaire + icône au vert de marque.
+    private func sectionHeader(_ key: String, icon: String) -> some View {
+        Label {
+            Text(LocalizedStringKey(key))
+        } icon: {
+            Image(systemName: icon)
+                .foregroundStyle(DSColors.brand)
         }
     }
 

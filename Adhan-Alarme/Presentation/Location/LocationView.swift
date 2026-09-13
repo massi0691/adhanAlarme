@@ -61,7 +61,7 @@ struct LocationView: View {
         switch viewModel.authorization {
         case .authorized:
             Label("location.automaticStatus.authorized", systemImage: "checkmark.circle.fill")
-                .foregroundStyle(.green)
+                .foregroundStyle(DSColors.brand)
         case .denied, .restricted:
             VStack(alignment: .leading, spacing: DSSpacing.xs) {
                 Label("location.automaticStatus.denied", systemImage: "location.slash.fill")
@@ -124,6 +124,8 @@ struct LocationView: View {
                         viewModel.activate(city)
                     } label: {
                         HStack {
+                            Image(systemName: "mappin.circle.fill")
+                                .foregroundStyle(DSColors.brand)
                             VStack(alignment: .leading) {
                                 Text(city.name)
                                 if let country = city.country {
