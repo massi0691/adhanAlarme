@@ -1,8 +1,9 @@
 import Foundation
 import Observation
 
-/// ViewModel de l'écran Réglages (section voix) : sélection persistée,
-/// disponibilités, téléchargements avec progression, aperçu de lecture.
+/// ViewModel de l'écran Réglages (voix, alertes, calcul) : sélection
+/// persistée, téléchargements, aperçu de lecture, modes d'alerte,
+/// méthode et ajustements de calcul.
 /// L'état de lecture est observé en direct (service `@Observable`).
 @Observable
 @MainActor
@@ -22,6 +23,13 @@ final class SettingsViewModel {
     /// Miroir de l'interrupteur global (partagé avec l'accueil).
     private(set) var alertsEnabled = true
     private(set) var alertModes: [Prayer: PrayerAlertMode] = [:]
+    private(set) var calculationMethod: CalculationMethod = .muslimWorldLeague
+    private(set) var asrMethod: AsrMethod = .standard
+    private(set) var highLatitudeRule: HighLatitudeRule = .middleOfNight
+    private(set) var usesCustomAngles = false
+    private(set) var fajrAngle: Double = 18
+    private(set) var ishaAngle: Double = 17
+    private(set) var manualAdjustments: [Prayer: Int] = [:]
 
     /// Lecture directe du service : suivi temps réel (interruptions, fin…).
     var playbackState: AdhanPlaybackState { playback.state }
@@ -41,12 +49,14 @@ final class SettingsViewModel {
         self.selectedMuezzinID = settingsStore.settings.selectedMuezzinID
         refreshAvailability()
         syncAlertState()
+        syncCalculationState()
     }
 
     func refresh() {
         selectedMuezzinID = settingsStore.settings.selectedMuezzinID
         refreshAvailability()
         syncAlertState()
+        syncCalculationState()
     }
 
     /// Sélection globale : voix par défaut + propagation aux 6 prières
@@ -160,6 +170,107 @@ final class SettingsViewModel {
         } catch {
             // Best-effort : les réglages restent valides sans planification.
         }
+    }
+
+    // MARK: - Calcul
+
+    /// Méthode de calcul (MWL, UOIF…).
+    func setCalculationMethod(_ method: CalculationMethod) {
+        var calculation = settingsStore.settings.calculation
+        calculation.method = method
+        settingsStore.settings.calculation = calculation
+        syncCalculationState()
+        Task { await refreshAlerts() }
+    }
+
+    /// Convention Asr (standard / Hanafi).
+    func setAsrMethod(_ method: AsrMethod) {
+        var calculation = settingsStore.settings.calculation
+        calculation.asrMethod = method
+        settingsStore.settings.calculation = calculation
+        syncCalculationState()
+        Task { await refreshAlerts() }
+    }
+
+    /// Règle de haute latitude.
+    func setHighLatitudeRule(_ rule: HighLatitudeRule) {
+        var calculation = settingsStore.settings.calculation
+        calculation.highLatitudeRule = rule
+        settingsStore.settings.calculation = calculation
+        syncCalculationState()
+        Task { await refreshAlerts() }
+    }
+
+    /// Angles personnalisés : à l'activation, reprend les angles de la
+    /// méthode comme point de départ ; à la coupure, les efface.
+    /// (Les deux angles sont toujours posés/effacés ensemble.)
+    func setUsesCustomAngles(_ enabled: Bool) {
+        var calculation = settingsStore.settings.calculation
+        if enabled {
+            let defaults = calculation.method.defaultPrayerParameters
+            calculation.fajrAngleOverride = defaults.fajrAngle
+            if case .angle(let angle) = defaults.isha {
+                calculation.ishaAngleOverride = angle
+            } else {
+                calculation.ishaAngleOverride = 17
+            }
+        } else {
+            calculation.fajrAngleOverride = nil
+            calculation.ishaAngleOverride = nil
+        }
+        settingsStore.settings.calculation = calculation
+        syncCalculationState()
+        Task { await refreshAlerts() }
+    }
+
+    /// Angle Fajr personnalisé (borné 5–25°).
+    func setFajrAngle(_ angle: Double) {
+        var calculation = settingsStore.settings.calculation
+        calculation.fajrAngleOverride = min(25, max(5, angle))
+        settingsStore.settings.calculation = calculation
+        syncCalculationState()
+        Task { await refreshAlerts() }
+    }
+
+    /// Angle Isha personnalisé (borné 5–25°) ; remplace aussi un
+    /// intervalle fixe (Umm al-Qura, Qatar) par un angle.
+    func setIshaAngle(_ angle: Double) {
+        var calculation = settingsStore.settings.calculation
+        calculation.ishaAngleOverride = min(25, max(5, angle))
+        settingsStore.settings.calculation = calculation
+        syncCalculationState()
+        Task { await refreshAlerts() }
+    }
+
+    /// Ajustement manuel d'une prière, en minutes (0 = effacé).
+    func setManualAdjustment(_ minutes: Int, for prayer: Prayer) {
+        var calculation = settingsStore.settings.calculation
+        if minutes == 0 {
+            calculation.manualAdjustments.removeValue(forKey: prayer)
+        } else {
+            calculation.manualAdjustments[prayer] = min(120, max(-120, minutes))
+        }
+        settingsStore.settings.calculation = calculation
+        syncCalculationState()
+        Task { await refreshAlerts() }
+    }
+
+    private func syncCalculationState() {
+        let config = settingsStore.settings.calculation
+        calculationMethod = config.method
+        asrMethod = config.asrMethod
+        highLatitudeRule = config.highLatitudeRule
+        usesCustomAngles = config.fajrAngleOverride != nil || config.ishaAngleOverride != nil
+        let defaults = config.method.defaultPrayerParameters
+        fajrAngle = config.fajrAngleOverride ?? defaults.fajrAngle
+        if let override = config.ishaAngleOverride {
+            ishaAngle = override
+        } else if case .angle(let angle) = defaults.isha {
+            ishaAngle = angle
+        } else {
+            ishaAngle = 17
+        }
+        manualAdjustments = config.manualAdjustments
     }
 
     private func refreshAvailability() {
