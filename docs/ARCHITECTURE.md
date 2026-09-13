@@ -455,3 +455,31 @@ audio/notifications) restent `Sendable`. Les délégués ObjC
 - Kabyle : vérifier `kab.lproj` copié (Target Membership), sinon
   repli silencieux vers la langue appareil.
 - Faire valider `Kabyle.strings` par un kabylophone.
+
+## 14. Design (vert émeraude / blanc / doré)
+
+### 14.1 Marque et thèmes
+- Couleurs tirées de l'icône : `DSColors` (émeraude `brand`,
+  doré `gold`/`goldBright`, encre `brandInk`), adaptatives
+  clair/sombre via `UIColor(dynamicProvider:)` (contraste AA).
+- Sélecteur in-app Système/Clair/Sombre (`AppAppearance` +
+  `AppearanceSettings`, même pattern que la langue) appliqué par
+  `.preferredColorScheme` à la racine ; teinte globale émeraude.
+- Fond d'accueil : voile vert (pâle en clair, profond en sombre).
+
+### 14.2 Accueil façon Mawaqit
+- Carte hero : dégradé émeraude profond, médaillon doré de la
+  prière, horaire blanc, compte à rebours en pilule dorée.
+- Lignes : médaillon SF Symbols du moment (aube → lune),
+  doré pour la prochaine, estompées si passées.
+- Icônes natives uniquement (zéro asset) : 60 ips, Dynamic Type,
+  RTL et VoiceOver préservés.
+
+### 14.3 Réglages et Position
+- En-têtes de sections icônés, icônes de prières dans les
+  alertes par prière, Camille au vert de marque.
+
+### 14.4 Recette visuelle
+- `⌘B` + `⌘U`, puis accueil en clair/sombre/système + arabe (RTL).
+- Bascules langue × apparence sans redémarrage ni flash.
+- Dynamic Type maximal : aucune troncature des médaillons.

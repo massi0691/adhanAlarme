@@ -398,4 +398,15 @@ struct SettingsViewModelTests {
         }
         #expect(!world.alerts.scheduled.isEmpty)
     }
+
+    @Test func setAppearancePersists() {
+        guard let world = makeWorld() else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        world.viewModel.setAppearance(.dark)
+        #expect(world.viewModel.appearance == .dark)
+        let reloaded = UserDefaultsSettingsStore(userDefaults: world.defaults)
+        #expect(reloaded.settings.appearance == .dark)
+    }
 }
