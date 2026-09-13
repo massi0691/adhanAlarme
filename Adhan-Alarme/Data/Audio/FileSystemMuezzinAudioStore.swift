@@ -116,18 +116,20 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
         var excluded = directory
         var backupValues = URLResourceValues()
         backupValues.isExcludedFromBackup = true
+        try? excluded.setResourceValues(backupValues)
         // Lisible après le premier déverrouillage : la lecture survit
         // à l'extinction de l'écran (cause connue de coupure audio).
-        backupValues.fileProtection = .completeUntilFirstUserAuthentication
-        try? excluded.setResourceValues(backupValues)
+        relaxProtection(directory)
     }
 
-    /// Protection « lisible après 1er déverrouillage » sur un fichier.
+    /// Protection « lisible après 1er déverrouillage » sur un fichier
+    /// ou dossier (`fileProtection` est en lecture seule sur
+    /// `URLResourceValues` : on passe par `FileManager.setAttributes`).
     nonisolated static func relaxProtection(_ url: URL) {
-        var target = url
-        var values = URLResourceValues()
-        values.fileProtection = .completeUntilFirstUserAuthentication
-        try? target.setResourceValues(values)
+        try? FileManager.default.setAttributes(
+            [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
+            ofItemAtPath: url.path(percentEncoded: false)
+        )
     }
 
     /// Aligne un fichier existant sur la protection média (migration
@@ -135,7 +137,7 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
     /// des lectures, sans re-téléchargement).
     nonisolated static func ensureMediaProtection(_ url: URL) {
         let current = (try? url.resourceValues(forKeys: [.fileProtectionKey]))?.fileProtection
-        guard current != .completeUntilFirstUserAuthentication, current != .none else { return }
+        guard current != .completeUntilFirstUserAuthentication, current != nil else { return }
         relaxProtection(url)
     }
 
@@ -185,8 +187,8 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
 private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
     // Écrits dans `init`, jamais mutés ensuite : partage sûr avec les
     // callbacks non isolés (même contrat que `CompletionBox`).
-    private nonisolated(unsafe) let destination: URL
-    private nonisolated(unsafe) let muezzinID: String
+    private let destination: URL
+    private let muezzinID: String
     private nonisolated(unsafe) let continuation: AsyncThrowingStream<Double, Error>.Continuation
 
     nonisolated init(destination: URL, muezzinID: String, continuation: AsyncThrowingStream<Double, Error>.Continuation) {
@@ -242,7 +244,7 @@ private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unc
 /// Annulation `Sendable` d'une tâche (`URLSessionTask` ne l'est pas).
 private final class DownloadCanceller: @unchecked Sendable {
     // Écrit dans `init`, jamais muté ensuite : partage sûr.
-    private nonisolated(unsafe) let task: URLSessionTask
+    private let task: URLSessionTask
 
     nonisolated init(task: URLSessionTask) {
         self.task = task
