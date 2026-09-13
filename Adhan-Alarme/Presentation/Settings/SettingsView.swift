@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Écran Réglages (feuille depuis l'accueil) : alertes par prière
-/// (interrupteur global + mode par prière) et voix de l'Adhan
-/// (sélection, téléchargement/suppression, aperçu de lecture).
+/// Écran Réglages (feuille depuis l'accueil) : calcul des horaires
+/// (méthode, Asr, hautes latitudes, angles, ajustements), alertes par
+/// prière et voix de l'Adhan (sélection, téléchargement, aperçu).
 struct SettingsView: View {
     @State private var viewModel: SettingsViewModel
     @Environment(\.dismiss) private var dismiss
@@ -14,6 +14,48 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("settings.calculation.section") {
+                    Picker("settings.calculation.method", selection: methodBinding()) {
+                        ForEach(CalculationMethod.allCases, id: \.self) { method in
+                            Text(LocalizedStringKey(method.titleKey)).tag(method)
+                        }
+                    }
+                    Picker("settings.calculation.asr", selection: asrBinding()) {
+                        ForEach(AsrMethod.allCases, id: \.self) { method in
+                            Text(LocalizedStringKey(method.titleKey)).tag(method)
+                        }
+                    }
+                    Picker("settings.calculation.highLatitude", selection: ruleBinding()) {
+                        ForEach(HighLatitudeRule.allCases, id: \.self) { rule in
+                            Text(LocalizedStringKey(rule.titleKey)).tag(rule)
+                        }
+                    }
+                    Toggle("settings.calculation.customAngles", isOn: customAnglesBinding())
+                    if viewModel.usesCustomAngles {
+                        Stepper(value: fajrAngleBinding(), in: 5...25, step: 0.5) {
+                            HStack {
+                                Text("settings.calculation.fajrAngle")
+                                Spacer()
+                                Text(formattedAngle(viewModel.fajrAngle))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        Stepper(value: ishaAngleBinding(), in: 5...25, step: 0.5) {
+                            HStack {
+                                Text("settings.calculation.ishaAngle")
+                                Spacer()
+                                Text(formattedAngle(viewModel.ishaAngle))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        Button("settings.calculation.defaultAngles") {
+                            viewModel.setUsesCustomAngles(false)
+                        }
+                    }
+                    NavigationLink("settings.calculation.adjustments") {
+                        CalculationAdjustmentsView(viewModel: viewModel)
+                    }
+                }
                 Section("settings.alerts.section") {
                     Toggle("settings.alerts.enabled", isOn: Binding(
                         get: { viewModel.alertsEnabled },
@@ -127,6 +169,52 @@ struct SettingsView: View {
         case .bundled, .unavailable, nil:
             EmptyView()
         }
+    }
+
+    private func methodBinding() -> Binding<CalculationMethod> {
+        Binding(
+            get: { viewModel.calculationMethod },
+            set: { viewModel.setCalculationMethod($0) }
+        )
+    }
+
+    private func asrBinding() -> Binding<AsrMethod> {
+        Binding(
+            get: { viewModel.asrMethod },
+            set: { viewModel.setAsrMethod($0) }
+        )
+    }
+
+    private func ruleBinding() -> Binding<HighLatitudeRule> {
+        Binding(
+            get: { viewModel.highLatitudeRule },
+            set: { viewModel.setHighLatitudeRule($0) }
+        )
+    }
+
+    private func customAnglesBinding() -> Binding<Bool> {
+        Binding(
+            get: { viewModel.usesCustomAngles },
+            set: { viewModel.setUsesCustomAngles($0) }
+        )
+    }
+
+    private func fajrAngleBinding() -> Binding<Double> {
+        Binding(
+            get: { viewModel.fajrAngle },
+            set: { viewModel.setFajrAngle($0) }
+        )
+    }
+
+    private func ishaAngleBinding() -> Binding<Double> {
+        Binding(
+            get: { viewModel.ishaAngle },
+            set: { viewModel.setIshaAngle($0) }
+        )
+    }
+
+    private func formattedAngle(_ angle: Double) -> String {
+        String(format: "%.1f°", angle)
     }
 
     private func modeBinding(for prayer: Prayer) -> Binding<PrayerAlertMode> {

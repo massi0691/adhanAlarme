@@ -1498,6 +1498,22 @@
         }
       }
     },
+    "settings.calculation.minutesFormat": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%+d min"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%+d min"
+          }
+        }
+      }
+    },
     "settings.calculation.section": {
       "localizations": {
         "fr": {

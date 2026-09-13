@@ -108,3 +108,4 @@
 "settings.calculation.ishaAngle" = "Tezɣelt n Lɛica";
 "settings.calculation.method" = "Tarrayt";
 "settings.calculation.section" = "Asiḍen n wakuden";
+"settings.calculation.minutesFormat" = "%+d tusdatin";
