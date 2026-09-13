@@ -55,7 +55,11 @@ struct SettingsViewModelTests {
         var scheduled: [[PrayerAlertRequest]] = []
         var cancelledPrefixes: [String] = []
         func authorizationStatus() async -> PrayerAlertAuthorization { status }
-        func requestAuthorization() async -> PrayerAlertAuthorization { status }
+        var requestAuthorizationCalls = 0
+        func requestAuthorization() async -> PrayerAlertAuthorization {
+            requestAuthorizationCalls += 1
+            return status
+        }
         func schedule(_ requests: [PrayerAlertRequest]) async throws { scheduled.append(requests) }
         func cancelAllAlerts() async {}
         func cancelChainedSegments(dayIdentifier: String) async { cancelledPrefixes.append(dayIdentifier) }
@@ -408,5 +412,29 @@ struct SettingsViewModelTests {
         #expect(world.viewModel.appearance == .dark)
         let reloaded = UserDefaultsSettingsStore(userDefaults: world.defaults)
         #expect(reloaded.settings.appearance == .dark)
+    }
+
+    @Test func enableAlertsRequestsAuthorizationWhenUndetermined() async {
+        guard let world = makeWorld() else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        world.alerts.status = .notDetermined
+        world.viewModel.disableAlerts()
+        await world.viewModel.enableAlerts()
+        #expect(world.alerts.requestAuthorizationCalls == 1)
+        #expect(world.viewModel.alertsEnabled == false)
+    }
+
+    @Test func deniedAuthorizationDisablesAlertsTruthfully() async {
+        guard let world = makeWorld() else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        world.alerts.status = .denied
+        await world.viewModel.enableAlerts()
+        #expect(world.viewModel.alertsEnabled == false)
+        let reloaded = UserDefaultsSettingsStore(userDefaults: world.defaults)
+        #expect(reloaded.settings.globalAdhanEnabled == false)
     }
 }

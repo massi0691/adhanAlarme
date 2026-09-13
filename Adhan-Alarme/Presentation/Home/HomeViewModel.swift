@@ -86,6 +86,7 @@ final class HomeViewModel {
             cityName = location.displayName ?? AppLocalization.string(forKey: "home.location.current", language: language.appLanguage)
             adhanEnabled = settingsStore.settings.globalAdhanEnabled
             state = .loaded(PrayerDay(times: today, next: next))
+            await ensureAlertsAuthorization()
             await scheduleAlertsIfNeeded(for: today, now: now)
         } catch {
             state = .failed
@@ -104,8 +105,18 @@ final class HomeViewModel {
     /// Replanifie après un changement (bascule globale).
     private func refreshAlerts() async {
         lastScheduledDayID = nil
+        await ensureAlertsAuthorization()
         guard case .loaded(let day) = state else { return }
         await scheduleAlertsIfNeeded(for: day.times, now: Date())
+    }
+
+    /// Si les alertes sont activées mais jamais autorisées : demande
+    /// système (contexte explicite : l'interrupteur est ON). iOS ne
+    /// présente le dialogue qu'une seule fois.
+    private func ensureAlertsAuthorization() async {
+        guard settingsStore.settings.globalAdhanEnabled,
+              await alertService.authorizationStatus() == .notDetermined else { return }
+        _ = await alertService.requestAuthorization()
     }
 
     /// Planifie après un chargement réussi, une seule fois par jour.
@@ -118,7 +129,13 @@ final class HomeViewModel {
             try await alertService.schedule(requests)
             lastScheduledDayID = dayID
         } catch {
-            // Réessayé au prochain chargement.
+            // Refus système : l'interrupteur repasse à OFF (état véridique ;
+            // réactivation depuis Réglages après autorisation dans iOS).
+            if await alertService.authorizationStatus() == .denied {
+                settingsStore.setGlobalAdhanEnabled(false)
+                adhanEnabled = false
+            }
+            // Sinon : réessayé au prochain chargement.
         }
     }
 

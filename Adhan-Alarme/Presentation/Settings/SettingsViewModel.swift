@@ -148,7 +148,11 @@ final class SettingsViewModel {
     /// Active les alertes : demande système puis planification.
     func enableAlerts() async {
         alertAuthorization = await alertService.requestAuthorization()
-        guard alertAuthorization.canSchedule else { return }
+        guard alertAuthorization.canSchedule else {
+            settingsStore.settings.globalAdhanEnabled = false
+            alertsEnabled = false
+            return
+        }
         settingsStore.settings.globalAdhanEnabled = true
         alertsEnabled = true
         await refreshAlerts()
@@ -215,6 +219,11 @@ final class SettingsViewModel {
             try await alertService.schedule(requests)
         } catch {
             // Best-effort : les réglages restent valides sans planification.
+            // Refus système : l'interrupteur repasse à OFF (état véridique).
+            if await alertService.authorizationStatus() == .denied {
+                settingsStore.settings.globalAdhanEnabled = false
+                alertsEnabled = false
+            }
         }
     }
 
