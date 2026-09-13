@@ -24,6 +24,10 @@ struct SettingsViewModelTests {
             if let deleteError { throw deleteError }
             deletedIDs.append(muezzin.id)
         }
+        var validatedIDs: [String] = []
+        func validateDownload(of muezzin: Muezzin) async throws {
+            validatedIDs.append(muezzin.id)
+        }
     }
 
     private final class MockPlayback: AdhanPlaybackService {
@@ -438,5 +442,20 @@ struct SettingsViewModelTests {
         #expect(world.viewModel.alertsEnabled == false)
         let reloaded = UserDefaultsSettingsStore(userDefaults: world.defaults)
         #expect(reloaded.settings.globalAdhanEnabled == false)
+    }
+
+    @Test func downloadValidatesFile() async {
+        let store = MockAudioStore()
+        guard let world = makeWorld(store: store) else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        guard let muezzin = Muezzin.withID(Muezzin.defaultID) else {
+            #expect(Bool(false), "voix par défaut absente")
+            return
+        }
+        await world.viewModel.download(muezzin)
+        #expect(store.validatedIDs == [muezzin.id])
+        #expect(world.viewModel.errorKey == nil)
     }
 }

@@ -120,6 +120,7 @@ final class SettingsViewModel {
             for try await progress in audioStore.download(muezzin) {
                 downloadProgress[muezzin.id] = progress
             }
+            try await audioStore.validateDownload(of: muezzin)
         } catch let error as AdhanPlaybackError {
             errorKey = Self.errorKey(for: error)
         } catch is CancellationError {

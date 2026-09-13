@@ -118,4 +118,20 @@ struct FileSystemMuezzinAudioStoreTests {
         let partPath = cache.appendingPathComponent("test.mp3.part").path(percentEncoded: false)
         #expect(FileManager.default.fileExists(atPath: partPath) == false)
     }
+
+    @Test func validateDownloadRemovesUnreadableFile() async throws {
+        let cache = try tempDir()
+        defer { try? FileManager.default.removeItem(at: cache) }
+        try writeDummy("not audio", to: cache.appendingPathComponent("test.mp3"))
+        let store = FileSystemMuezzinAudioStore(cacheDirectory: cache)
+        do {
+            try await store.validateDownload(of: voice())
+            #expect(Bool(false), "aurait dû jeter")
+        } catch let error as AdhanPlaybackError {
+            #expect(error == .downloadFailed(muezzinID: "test"))
+        } catch {
+            #expect(Bool(false), "mauvais type d'erreur")
+        }
+        #expect(store.localURL(for: voice()) == nil)
+    }
 }

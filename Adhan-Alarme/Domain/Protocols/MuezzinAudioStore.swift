@@ -14,4 +14,7 @@ protocol MuezzinAudioStore {
     func download(_ muezzin: Muezzin) -> AsyncThrowingStream<Double, Error>
     /// Supprime le fichier téléchargé (jamais le bundle).
     func deleteDownload(of muezzin: Muezzin) throws
+    /// Valide un fichier téléchargé (jouable), sinon le supprime et
+    /// jette `downloadFailed`.
+    func validateDownload(of muezzin: Muezzin) async throws
 }

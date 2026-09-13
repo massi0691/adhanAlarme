@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 
 /// Stockage audio : bundle embarqué + `Application Support/Adhan`
@@ -10,18 +11,15 @@ import Foundation
 final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
     private let bundle: Bundle
     private let fileManager: FileManager
-    private let session: URLSession
     private let cacheDirectory: URL
 
     init(
         bundle: Bundle = .main,
         fileManager: FileManager = .default,
-        session: URLSession = .shared,
         cacheDirectory: URL? = nil
     ) {
         self.bundle = bundle
         self.fileManager = fileManager
-        self.session = session
         if let cacheDirectory {
             self.cacheDirectory = cacheDirectory
         } else {
@@ -48,27 +46,19 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
         let muezzinID = muezzin.id
         let remoteURL = muezzin.remoteURL
         let destination = cachedURL(for: muezzin)
-        let session = session
         return AsyncThrowingStream { continuation in
-            let task = Task {
-                do {
-                    guard let remoteURL else {
-                        throw AdhanPlaybackError.remoteSourceNotConfigured(muezzinID: muezzinID)
-                    }
-                    try await Self.performDownload(from: remoteURL, to: destination, session: session) { progress in
-                        continuation.yield(progress)
-                    }
-                    continuation.yield(1.0)
-                    continuation.finish()
-                } catch is CancellationError {
-                    try? FileManager.default.removeItem(at: destination.appendingPathExtension("part"))
-                    continuation.finish(throwing: CancellationError())
-                } catch {
-                    try? FileManager.default.removeItem(at: destination.appendingPathExtension("part"))
-                    continuation.finish(throwing: AdhanPlaybackError.downloadFailed(muezzinID: muezzinID))
-                }
+            guard let remoteURL else {
+                continuation.finish(throwing: AdhanPlaybackError.remoteSourceNotConfigured(muezzinID: muezzinID))
+                return
             }
-            continuation.onTermination = { _ in task.cancel() }
+            // Session éphémère par transfert : progression native et
+            // écriture système directe (aucune boucle octet par octet).
+            let delegate = DownloadDelegate(destination: destination, muezzinID: muezzinID, continuation: continuation)
+            let session = URLSession(configuration: .ephemeral, delegate: delegate, delegateQueue: nil)
+            let task = session.downloadTask(with: remoteURL)
+            let canceller = DownloadCanceller(task: task)
+            continuation.onTermination = { _ in canceller.cancel() }
+            task.resume()
         }
     }
 
@@ -95,64 +85,95 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
         return fileManager.fileExists(atPath: url.path(percentEncoded: false)) ? url : nil
     }
 
-    // MARK: - Téléchargement (statique : aucune capture de `self`)
+    // MARK: - Téléchargement (URLSessionDownloadTask + délégué)
 
-    private static func performDownload(
-        from remoteURL: URL,
-        to destination: URL,
-        session: URLSession,
-        onProgress: @Sendable (Double) -> Void
-    ) async throws {
-        let manager = FileManager()
-        let directory = destination.deletingLastPathComponent()
-        try manager.createDirectory(at: directory, withIntermediateDirectories: true)
-        // Contenu re-téléchargeable : exclu de la sauvegarde iCloud.
-        var excludedDirectory = directory
-        var backupValues = URLResourceValues()
-        backupValues.isExcludedFromBackup = true
-        try? excludedDirectory.setResourceValues(backupValues)
+    /// Valide un fichier téléchargé (lisible et jouable), sinon le
+    /// supprime et jette `downloadFailed` (l'utilisateur peut réessayer).
+    func validateDownload(of muezzin: Muezzin) async throws {
+        guard let url = cachedURLIfExists(for: muezzin) else {
+            throw AdhanPlaybackError.downloadFailed(muezzinID: muezzin.id)
+        }
+        let asset = AVURLAsset(url: url)
+        let playable = (try? await asset.load(.isPlayable)) ?? false
+        guard playable else {
+            try? fileManager.removeItem(at: url)
+            throw AdhanPlaybackError.downloadFailed(muezzinID: muezzin.id)
+        }
+    }
+}
 
-        let (bytes, response) = try await session.bytes(from: remoteURL)
-        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-            throw URLError(.badServerResponse)
-        }
-        let expected = http.expectedContentLength
-        let tempURL = destination.appendingPathExtension("part")
-        guard manager.createFile(atPath: tempURL.path(percentEncoded: false), contents: nil) else {
-            throw URLError(.cannotCreateFile)
-        }
-        guard let handle = FileHandle(forWritingAtPath: tempURL.path(percentEncoded: false)) else {
-            throw URLError(.cannotOpenFile)
-        }
-        defer { try? handle.close() }
+/// Délégué de téléchargement : progression native + déplacement atomique.
+/// `URLSession` retient son délégué ; `finishTasksAndInvalidate` rompt le
+/// cycle en fin de transfert (succès, échec ou annulation). Seul état
+/// partagé : la continuation (thread-safe par contrat Apple).
+private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
+    private let destination: URL
+    private let muezzinID: String
+    private let continuation: AsyncThrowingStream<Double, Error>.Continuation
+
+    init(destination: URL, muezzinID: String, continuation: AsyncThrowingStream<Double, Error>.Continuation) {
+        self.destination = destination
+        self.muezzinID = muezzinID
+        self.continuation = continuation
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        downloadTask: URLSessionDownloadTask,
+        didWriteData bytesWritten: Int64,
+        totalBytesWritten: Int64,
+        totalBytesExpectedToWrite: Int64
+    ) {
+        guard totalBytesExpectedToWrite > 0 else { return }
+        continuation.yield(Double(totalBytesWritten) / Double(totalBytesExpectedToWrite))
+    }
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        defer { session.finishTasksAndInvalidate() }
         do {
-            // Écriture par blocs de 64 Ko (jamais octet par octet).
-            var buffer = Data()
-            buffer.reserveCapacity(65536)
-            var received: Int64 = 0
-            for try await byte in bytes {
-                try Task.checkCancellation()
-                buffer.append(byte)
-                received += 1
-                if buffer.count >= 65536 {
-                    try handle.write(contentsOf: buffer)
-                    buffer.removeAll(keepingCapacity: true)
-                    if expected > 0 {
-                        onProgress(Double(received) / Double(expected))
-                    }
-                }
+            // Les erreurs HTTP arrivent ici avec un corps : vérifier d'abord.
+            if let http = downloadTask.response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+                throw URLError(.badServerResponse)
             }
-            if !buffer.isEmpty {
-                try handle.write(contentsOf: buffer)
-            }
-            try handle.close()
+            let manager = FileManager()
+            let directory = destination.deletingLastPathComponent()
+            try manager.createDirectory(at: directory, withIntermediateDirectories: true)
+            // Contenu re-téléchargeable : exclu de la sauvegarde iCloud.
+            var excludedDirectory = directory
+            var backupValues = URLResourceValues()
+            backupValues.isExcludedFromBackup = true
+            try? excludedDirectory.setResourceValues(backupValues)
             if manager.fileExists(atPath: destination.path(percentEncoded: false)) {
                 try manager.removeItem(at: destination)
             }
-            try manager.moveItem(at: tempURL, to: destination)
+            try manager.moveItem(at: location, to: destination)
+            continuation.yield(1.0)
+            continuation.finish()
         } catch {
-            try? manager.removeItem(at: tempURL)
-            throw error
+            continuation.finish(throwing: AdhanPlaybackError.downloadFailed(muezzinID: muezzinID))
         }
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        defer { session.finishTasksAndInvalidate() }
+        guard let error else { return }  // Succès : déjà terminé ci-dessus.
+        if (error as? URLError)?.code == .cancelled {
+            continuation.finish(throwing: CancellationError())
+        } else {
+            continuation.finish(throwing: AdhanPlaybackError.downloadFailed(muezzinID: muezzinID))
+        }
+    }
+}
+
+/// Annulation `Sendable` d'une tâche (`URLSessionTask` ne l'est pas).
+private final class DownloadCanceller: @unchecked Sendable {
+    private let task: URLSessionTask
+
+    init(task: URLSessionTask) {
+        self.task = task
+    }
+
+    func cancel() {
+        task.cancel()
     }
 }
