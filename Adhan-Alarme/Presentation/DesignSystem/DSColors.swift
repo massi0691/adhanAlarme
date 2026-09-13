@@ -20,6 +20,19 @@ enum DSColors {
     static let gold = adaptive(light: 0x8F6B00, dark: 0xEAC65E)
     /// Doré lumineux fixe : accents sur fond vert profond (carte hero).
     static let goldBright = Color(rgb: 0xE3B94E)
+    /// Vert encre fixe : texte et icônes sur fond doré.
+    static let brandInk = Color(rgb: 0x073D22)
+    /// Fond d'accueil : voile émeraude pâle (thème clair) ou profond
+    /// (thème sombre), fondu vers le fond système. Suit le thème choisi
+    /// via `dynamicProvider` (y compris le forçage in-app).
+    static let homeBackground = LinearGradient(
+        colors: [
+            adaptive(light: 0xDDF0E3, dark: 0x062A1B),
+            Color(UIColor.systemGroupedBackground),
+        ],
+        startPoint: .top,
+        endPoint: .bottom
+    )
     /// Texte sur fond de marque.
     static let onBrand = Color.white
     /// Surlignage de la prochaine prière (teinte émeraude douce).

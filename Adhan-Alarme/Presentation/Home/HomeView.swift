@@ -60,7 +60,9 @@ struct HomeView: View {
             }
             .padding(DSSpacing.md)
         }
-        .background(DSColors.background)
+        .background {
+            DSColors.homeBackground.ignoresSafeArea()
+        }
         .refreshable {
             await viewModel.load()
         }

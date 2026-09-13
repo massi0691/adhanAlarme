@@ -1,6 +1,8 @@
 import SwiftUI
 
-/// Ligne d'horaire : nom localisé, nom arabe et heure.
+/// Ligne d'horaire : médaillon icône (moment du soleil), nom localisé,
+/// nom arabe et heure. La prochaine prière se distingue par un
+/// médaillon doré ; les prières passées sont estompées.
 struct PrayerRowView: View {
     let prayer: Prayer
     let time: Date
@@ -8,7 +10,13 @@ struct PrayerRowView: View {
     let isPast: Bool
 
     var body: some View {
-        HStack {
+        HStack(spacing: DSSpacing.md) {
+            Image(systemName: prayer.iconName)
+                .font(.body)
+                .foregroundStyle(isNext ? DSColors.brandInk : DSColors.brand)
+                .frame(minWidth: 40, minHeight: 40)
+                .background(isNext ? DSColors.goldBright : DSColors.brand.opacity(0.12))
+                .clipShape(Circle())
             VStack(alignment: .leading, spacing: 2) {
                 Text(LocalizedStringKey(prayer.titleKey))
                     .font(DSTypography.prayerName)
