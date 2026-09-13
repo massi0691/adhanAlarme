@@ -374,3 +374,46 @@ audio/notifications) restent `Sendable`. Les délégués ObjC
   (cohérence en/hors-ligne) ; ajustement +5 Fajr → Fajr +5 min.
 - Alertes replanifiées avec les nouveaux horaires (vérifiable en
   `lldb` via `getPendingNotificationRequests`).
+
+## 12. Hack « Adhan long » (phase 4-bis, expérimental, opt-in)
+
+### 12.1 Principe et limites assumées
+- iOS limite chaque son de notification à 30 s (OS, incontournable) :
+  l'Adhan complet est découpé en segments chaînés (notifications à
+  +30 s, ≈ 8 bannières par prière).
+- Interrupteur « Adhan long (expérimental) », désactivé par défaut ;
+  la voix doit être téléchargée (découpage du fichier local).
+- Couverture réduite : ~48 requêtes/jour sur 64 max → ≈ 1 jour
+  (le service garde les 64 premières, chronologiques).
+- API publique uniquement, aucune règle écrite violée ; toute
+  interaction annule la chaîne en cours.
+
+### 12.2 Chaîne technique
+- `FileSystemAdhanSegmentStore` : découpe (idempotente, hors MainActor)
+  en `.caf` IMA4 dans `Library/Sounds`, `adhan-<voix>-s<k>.caf`.
+- `SchedulePrayerAlertsUseCase` : occurrences `.adhan` expansées
+  (+30 s, `soundName`/`segmentIndex`, identifiants `.s<k>`) ; sans
+  segments prêts, repli notification unique ; `.notificationOnly`
+  jamais chaîné.
+- Fabrique : `request.soundName` prioritaire sur le son global.
+- `cancelChainedSegments` (préfixe jour) appelé par le délégué à
+  chaque présentation/interaction : l'ouverture de l'app fait taire
+  la chaîne (relais AVPlayer ou bannière).
+
+### 12.3 Tests
+- `SchedulePrayerAlertsUseCaseTests` (+ 2 : expansion/espacement/
+  identifiants, repli sans segments), `SettingsViewModelTests`
+  (+ 2 : voix requise, activation bout-en-bout).
+- Découpe réelle et enchaînement sonore : recette manuelle (le
+  simulateur ne rend pas fidèlement les sons chaînés).
+
+### 12.4 Recette manuelle
+- `⌘B` + `⌘U`.
+- Télécharger une voix → activer Adhan long → « Préparation des
+  extraits… » puis ~48 notifications en attente (`lldb`).
+- Sans voix téléchargée → message clair, pas d'activation.
+- À l'échéance (verrouillé) : bannières chaînées + extraits bout à
+  bout (≈ 8) ; ouvrir l'app en cours → silence immédiat.
+- « Écouter » → Adhan complet AVPlayer, chaîne annulée.
+- Désactiver → retour notification unique ; couverture ≈ 1 jour
+  (rouvrir l'app quotidiennement).

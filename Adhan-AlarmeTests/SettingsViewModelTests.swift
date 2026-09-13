@@ -7,6 +7,7 @@ import Testing
 struct SettingsViewModelTests {
     private final class MockAudioStore: MuezzinAudioStore {
         var availabilityMap: [String: MuezzinAudioAvailability] = [:]
+        var localURLMap: [String: URL] = [:]
         var downloadStream: (Muezzin) -> AsyncThrowingStream<Double, Error> = { _ in
             AsyncThrowingStream { $0.finish() }
         }
@@ -15,7 +16,7 @@ struct SettingsViewModelTests {
         func availability(of muezzin: Muezzin) -> MuezzinAudioAvailability {
             availabilityMap[muezzin.id] ?? .unavailable
         }
-        func localURL(for muezzin: Muezzin) -> URL? { nil }
+        func localURL(for muezzin: Muezzin) -> URL? { localURLMap[muezzin.id] }
         func download(_ muezzin: Muezzin) -> AsyncThrowingStream<Double, Error> {
             downloadStream(muezzin)
         }
@@ -338,5 +339,35 @@ struct SettingsViewModelTests {
         world.viewModel.setManualAdjustment(0, for: .fajr)
         let reloaded = UserDefaultsSettingsStore(userDefaults: world.defaults)
         #expect(reloaded.settings.calculation.manualAdjustments[.fajr] == nil)
+    }
+
+    @Test func longAdhanRequiresDownloadedVoice() async {
+        guard let world = makeWorld() else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        await world.viewModel.setLongAdhanEnabled(true)
+        #expect(world.viewModel.longAdhanEnabled == false)
+        #expect(world.viewModel.errorKey == "settings.alerts.longAdhanNeedsDownload")
+    }
+
+    @Test func longAdhanToggleChainsEndToEnd() async {
+        let store = MockAudioStore()
+        store.localURLMap = ["makkah": URL(filePath: "/tmp/fake-adhan.mp3")]
+        let segments = StubSegments(names: ["a.caf", "b.caf"])
+        guard let world = makeWorld(store: store, segments: segments) else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        await world.viewModel.setLongAdhanEnabled(true)
+        #expect(world.viewModel.longAdhanEnabled == true)
+        #expect(world.viewModel.errorKey == nil)
+        guard let batch = world.alerts.scheduled.last else {
+            #expect(Bool(false), "aucune planification")
+            return
+        }
+        #expect(batch.contains { $0.segmentIndex != nil })
+        await world.viewModel.setLongAdhanEnabled(false)
+        #expect(world.viewModel.longAdhanEnabled == false)
     }
 }

@@ -149,4 +149,32 @@ struct SchedulePrayerAlertsUseCaseTests {
         )
         #expect(requests.count == 10)
     }
+
+    @Test func longAdhanExpandsChains() async throws {
+        var settings = AppSettings.default
+        settings.longAdhanEnabled = true
+        let segments = StubSegments(names: ["s0.caf", "s1.caf", "s2.caf"])
+        let requests = try await useCase(segments: segments).execute(
+            now: Self.utcDate(day: 13, hour: 10),
+            settings: settings
+        )
+        // Aujourd'hui : 4 Adhan x 3 + 6 jours x (5 Adhan x 3 + 1 simple).
+        #expect(requests.count == 108)
+        #expect(Set(requests.map(\.identifier)).count == 108)
+        let chain = Array(requests.prefix(3))
+        #expect(chain.allSatisfy { $0.prayer == .dhuhr })
+        #expect(chain.map(\.segmentIndex) == [0, 1, 2])
+        #expect(chain.map(\.soundName) == ["s0.caf", "s1.caf", "s2.caf"])
+        #expect(abs(chain[1].fireDate.timeIntervalSince(chain[0].fireDate) - 30) < 0.001)
+        #expect(chain[0].identifier == "adhan.dhuhr.20260913.s0")
+        #expect(requests.filter { $0.prayer == .sunrise }.allSatisfy { $0.segmentIndex == nil })
+    }
+
+    @Test func longAdhanWithoutSegmentsFallsBackToSingle() async throws {
+        var settings = AppSettings.default
+        settings.longAdhanEnabled = true
+        let requests = try await useCase().execute(now: Self.utcDate(day: 13, hour: 10), settings: settings)
+        #expect(requests.count == 40)
+        #expect(requests.allSatisfy { $0.segmentIndex == nil && $0.soundName == nil })
+    }
 }
