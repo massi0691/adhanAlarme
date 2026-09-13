@@ -9,3 +9,14 @@ enum PrayerAlertMode: String, Sendable, Codable, CaseIterable, Hashable {
     /// Aucune alerte.
     case silent
 }
+
+extension PrayerAlertMode {
+    /// Clé localisée du libellé affiché dans Réglages.
+    var labelKey: String {
+        switch self {
+        case .adhan: return "settings.alerts.mode.adhan"
+        case .notificationOnly: return "settings.alerts.mode.notification"
+        case .silent: return "settings.alerts.mode.silent"
+        }
+    }
+}

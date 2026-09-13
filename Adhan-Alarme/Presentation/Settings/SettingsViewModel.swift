@@ -19,6 +19,9 @@ final class SettingsViewModel {
     private(set) var downloadProgress: [String: Double] = [:]
     private(set) var errorKey: String?
     private(set) var alertAuthorization: PrayerAlertAuthorization = .notDetermined
+    /// Miroir de l'interrupteur global (partagé avec l'accueil).
+    private(set) var alertsEnabled = true
+    private(set) var alertModes: [Prayer: PrayerAlertMode] = [:]
 
     /// Lecture directe du service : suivi temps réel (interruptions, fin…).
     var playbackState: AdhanPlaybackState { playback.state }
@@ -37,11 +40,13 @@ final class SettingsViewModel {
         self.alertService = alertService
         self.selectedMuezzinID = settingsStore.settings.selectedMuezzinID
         refreshAvailability()
+        syncAlertState()
     }
 
     func refresh() {
         selectedMuezzinID = settingsStore.settings.selectedMuezzinID
         refreshAvailability()
+        syncAlertState()
     }
 
     /// Sélection globale : voix par défaut + propagation aux 6 prières
@@ -118,25 +123,35 @@ final class SettingsViewModel {
         let granted = (try? await alertService.requestAuthorization()) ?? false
         alertAuthorization = await alertService.authorizationStatus()
         guard granted else { return }
-        settingsStore.settings.alertsEnabled = true
+        settingsStore.settings.globalAdhanEnabled = true
+        alertsEnabled = true
         await refreshAlerts()
     }
 
     /// Coupe les alertes (les notifications planifiées sont annulées).
     func disableAlerts() {
-        settingsStore.settings.alertsEnabled = false
+        settingsStore.settings.globalAdhanEnabled = false
+        alertsEnabled = false
         Task { await refreshAlerts() }
     }
 
     /// Mode d'une prière (Adhan / notification / silencieux).
     func setAlertMode(_ mode: PrayerAlertMode, for prayer: Prayer) {
-        settingsStore.settings.prayerPreferences[prayer]?.alertMode = mode
+        settingsStore.settings.prayerPreferences[prayer]?.mode = mode
+        alertModes[prayer] = mode
         Task { await refreshAlerts() }
     }
 
     /// État de l'autorisation système (lu à l'ouverture de Réglages).
     func loadAlertAuthorization() async {
         alertAuthorization = await alertService.authorizationStatus()
+    }
+
+    private func syncAlertState() {
+        alertsEnabled = settingsStore.settings.globalAdhanEnabled
+        alertModes = Dictionary(uniqueKeysWithValues: settingsStore.settings.prayerPreferences.map {
+            ($0.key, $0.value.mode)
+        })
     }
 
     private func refreshAlerts() async {

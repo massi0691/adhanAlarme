@@ -74,3 +74,10 @@
 "audio.error.failed" = "Tighri ur teddi ara.";
 "alert.notification.body" = "Yewweḍ wakud n tzallit.";
 "alert.action.listen" = "Ssel ladhan";
+"settings.alerts.denied" = "Tilɣa twakksent — serrḥ-iten deg Iɣewwaren i wakken ad taweḍ ladhan.";
+"settings.alerts.enabled" = "Tilɣa";
+"settings.alerts.mode.adhan" = "Ladhan";
+"settings.alerts.mode.notification" = "Talɣa";
+"settings.alerts.mode.silent" = "Asusam";
+"settings.alerts.openSettings" = "Ldi Iɣewwaren";
+"settings.alerts.section" = "Tilɣa n tzallit";

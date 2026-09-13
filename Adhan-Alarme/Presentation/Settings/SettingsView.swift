@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Écran Réglages (feuille depuis l'accueil) : voix de l'Adhan —
-/// sélection, téléchargement/suppression, aperçu de lecture.
-/// Autres sections (alertes par prière…) : phases 4/5.
+/// Écran Réglages (feuille depuis l'accueil) : alertes par prière
+/// (interrupteur global + mode par prière) et voix de l'Adhan
+/// (sélection, téléchargement/suppression, aperçu de lecture).
 struct SettingsView: View {
     @State private var viewModel: SettingsViewModel
     @Environment(\.dismiss) private var dismiss
@@ -14,6 +14,34 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("settings.alerts.section") {
+                    Toggle("settings.alerts.enabled", isOn: Binding(
+                        get: { viewModel.alertsEnabled },
+                        set: { enabled in
+                            if enabled {
+                                Task { await viewModel.enableAlerts() }
+                            } else {
+                                viewModel.disableAlerts()
+                            }
+                        }
+                    ))
+                    if viewModel.alertAuthorization == .denied {
+                        Text("settings.alerts.denied")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                            Link("settings.alerts.openSettings", destination: settingsURL)
+                        }
+                    } else if viewModel.alertsEnabled {
+                        ForEach(Prayer.allCases) { prayer in
+                            Picker(LocalizedStringKey(prayer.titleKey), selection: modeBinding(for: prayer)) {
+                                ForEach(PrayerAlertMode.allCases, id: \.self) { mode in
+                                    Text(LocalizedStringKey(mode.labelKey)).tag(mode)
+                                }
+                            }
+                        }
+                    }
+                }
                 Section("settings.voice.section") {
                     ForEach(viewModel.voices) { muezzin in
                         voiceRow(muezzin)
@@ -34,6 +62,7 @@ struct SettingsView: View {
                 }
             }
             .onAppear { viewModel.refresh() }
+            .task { await viewModel.loadAlertAuthorization() }
         }
     }
 
@@ -98,6 +127,13 @@ struct SettingsView: View {
         case .bundled, .unavailable, nil:
             EmptyView()
         }
+    }
+
+    private func modeBinding(for prayer: Prayer) -> Binding<PrayerAlertMode> {
+        Binding(
+            get: { viewModel.alertModes[prayer] ?? .adhan },
+            set: { viewModel.setAlertMode($0, for: prayer) }
+        )
     }
 
     private func statusKey(for availability: MuezzinAudioAvailability?) -> String {

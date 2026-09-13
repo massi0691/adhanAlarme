@@ -67,6 +67,50 @@
         }
       }
     },
+    "alert.action.listen": {
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "استمع إلى الأذان"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen to the Adhan"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écouter l'Adhan"
+          }
+        }
+      }
+    },
+    "alert.notification.body": {
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حان وقت الصلاة."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It is time for prayer."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "C'est l'heure de la prière."
+          }
+        }
+      }
+    },
     "app.name": {
       "localizations": {
         "ar": {
@@ -85,6 +129,161 @@
           "stringUnit": {
             "state": "translated",
             "value": "Adhan Alarme"
+          }
+        }
+      }
+    },
+    "audio.error.downloadFailed": {
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل التحميل. تحقق من الاتصال وحاول مجدداً."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download failed. Check your connection and retry."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échec du téléchargement. Vérifiez la connexion et réessayez."
+          }
+        }
+      }
+    },
+    "audio.error.failed": {
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل التشغيل."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playback failed."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échec de la lecture."
+          }
+        }
+      }
+    },
+    "audio.error.notConfigured": {
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد مصدر صوتي معدّ لهذا الصوت."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No audio source configured for this voice."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune source audio configurée pour cette voix."
+          }
+        }
+      }
+    },
+    "audio.error.sessionFailed": {
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الصوت غير متاح (مكالمة جارية؟)."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio unavailable (call in progress?)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio indisponible (appel en cours ?)."
+          }
+        }
+      }
+    },
+    "audio.error.unavailable": {
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يتم تحميل الصوت بعد. قم بتحميل هذا الصوت أولاً."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio not downloaded yet. Download this voice first."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio non téléchargé. Téléchargez d'abord cette voix."
+          }
+        }
+      }
+    },
+    "audio.error.unreadable": {
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ملف الصوت تالف."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio file is corrupted."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichier audio illisible ou corrompu."
+          }
+        }
+      }
+    },
+    "audio.nowPlayingTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adhan – %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adhan – %@"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أذان – %@"
           }
         }
       }
@@ -771,6 +970,118 @@
         }
       }
     },
+    "settings.alerts.denied": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications désactivées — activez-les dans Réglages pour recevoir l'Adhan."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications are off — enable them in Settings to receive the Adhan."
+          }
+        }
+      }
+    },
+    "settings.alerts.enabled": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alertes"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alerts"
+          }
+        }
+      }
+    },
+    "settings.alerts.mode.adhan": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adhan"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adhan"
+          }
+        }
+      }
+    },
+    "settings.alerts.mode.notification": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notification"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notification"
+          }
+        }
+      }
+    },
+    "settings.alerts.mode.silent": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silencieux"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silent"
+          }
+        }
+      }
+    },
+    "settings.alerts.openSettings": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir Réglages"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        }
+      }
+    },
+    "settings.alerts.section": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alertes de prière"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer alerts"
+          }
+        }
+      }
+    },
     "settings.soon": {
       "localizations": {
         "ar": {
@@ -815,47 +1126,68 @@
         }
       }
     },
-    "audio.nowPlayingTitle": {
-      "extractionState": "manual",
+    "settings.voice.delete": {
       "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حذف"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adhan – %@"
+            "value": "Delete"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adhan – %@"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أذان – %@"
+            "value": "Supprimer"
           }
         }
       }
     },
-    "settings.voice.section": {
+    "settings.voice.download": {
       "localizations": {
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "صوت الأذان"
+            "value": "تحميل"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adhan voice"
+            "value": "Download"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Voix de l'Adhan"
+            "value": "Télécharger"
+          }
+        }
+      }
+    },
+    "settings.voice.downloading": {
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جارٍ التحميل…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Downloading…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Téléchargement…"
           }
         }
       }
@@ -926,90 +1258,24 @@
         }
       }
     },
-    "settings.voice.stop": {
+    "settings.voice.section": {
       "localizations": {
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "إيقاف"
+            "value": "صوت الأذان"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Stop"
+            "value": "Adhan voice"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Arrêter"
-          }
-        }
-      }
-    },
-    "settings.voice.download": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تحميل"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Download"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Télécharger"
-          }
-        }
-      }
-    },
-    "settings.voice.delete": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "حذف"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Delete"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Supprimer"
-          }
-        }
-      }
-    },
-    "settings.voice.downloading": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "جارٍ التحميل…"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Downloading…"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Téléchargement…"
+            "value": "Voix de l'Adhan"
           }
         }
       }
@@ -1102,178 +1368,24 @@
         }
       }
     },
-    "audio.error.unavailable": {
+    "settings.voice.stop": {
       "localizations": {
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "لم يتم تحميل الصوت بعد. قم بتحميل هذا الصوت أولاً."
+            "value": "إيقاف"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Audio not downloaded yet. Download this voice first."
+            "value": "Stop"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Audio non téléchargé. Téléchargez d'abord cette voix."
-          }
-        }
-      }
-    },
-    "audio.error.notConfigured": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "لا يوجد مصدر صوتي معدّ لهذا الصوت."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No audio source configured for this voice."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune source audio configurée pour cette voix."
-          }
-        }
-      }
-    },
-    "audio.error.downloadFailed": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فشل التحميل. تحقق من الاتصال وحاول مجدداً."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Download failed. Check your connection and retry."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Échec du téléchargement. Vérifiez la connexion et réessayez."
-          }
-        }
-      }
-    },
-    "audio.error.sessionFailed": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الصوت غير متاح (مكالمة جارية؟)."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Audio unavailable (call in progress?)."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Audio indisponible (appel en cours ?)."
-          }
-        }
-      }
-    },
-    "audio.error.unreadable": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ملف الصوت تالف."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Audio file is corrupted."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fichier audio illisible ou corrompu."
-          }
-        }
-      }
-    },
-    "audio.error.failed": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فشل التشغيل."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Playback failed."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Échec de la lecture."
-          }
-        }
-      }
-    },
-    "alert.notification.body": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "حان وقت الصلاة."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It is time for prayer."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "C'est l'heure de la prière."
-          }
-        }
-      }
-    },
-    "alert.action.listen": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "استمع إلى الأذان"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Listen to the Adhan"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Écouter l'Adhan"
+            "value": "Arrêter"
           }
         }
       }

@@ -126,6 +126,11 @@ final class HomeViewModel {
         return formatter
     }()
 
+    /// Resynchronise l'interrupteur (modifié depuis Réglages).
+    func syncAdhanFlag() {
+        adhanEnabled = settingsStore.settings.globalAdhanEnabled
+    }
+
     /// Recharge les horaires si le jour a changé (appelée chaque minute
     /// par la `TimelineView` de `HomeView`).
     func refreshIfNeeded(now: Date) {

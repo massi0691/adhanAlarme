@@ -31,6 +31,9 @@ struct HomeView: View {
             .sheet(isPresented: $showingSettings) {
                 SettingsView(viewModel: settingsViewModel)
             }
+            .onChange(of: showingSettings) { _, shown in
+                if !shown { viewModel.syncAdhanFlag() }
+            }
         }
     }
 
