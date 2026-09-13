@@ -1,17 +1,20 @@
-//
-//  Adhan_AlarmeApp.swift
-//  Adhan-Alarme
-//
-//  Created by massi9106 on 13/09/2026.
-//
-
 import SwiftUI
 
 @main
 struct Adhan_AlarmeApp: App {
+    @State private var container = AppContainer.production
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView(
+                viewModel: container.makeHomeViewModel(),
+                locationViewModel: container.makeLocationViewModel(),
+                settingsViewModel: container.makeSettingsViewModel()
+            )
+            .environment(\.locale, container.languageSettings.locale ?? Locale.current)
+            .environment(\.layoutDirection, container.languageSettings.appLanguage.isRightToLeft ? .rightToLeft : .leftToRight)
+            .preferredColorScheme(container.appearanceSettings.colorScheme)
+            .tint(DSColors.brand)
         }
     }
 }

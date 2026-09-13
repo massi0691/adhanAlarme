@@ -1,0 +1,28 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSLocationWhenInUseUsageDescription" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نستخدم موقعك فقط لحساب مواقيت الصلاة في مدينتك."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We use your location only to calculate prayer times for your city."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nous utilisons votre position uniquement pour calculer les horaires de prière de votre ville."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

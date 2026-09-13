@@ -1,0 +1,131 @@
+/*
+  Kabyle (kab) — TRADUCTIONS PROVISOIRES.
+  À valider par un locuteur natif avant la phase 6.
+
+  NOTE : la table s'appelle "Kabyle" (et non "Localizable") car Xcode
+  interdit la coexistence d'un catalogue Localizable.xcstrings avec une
+  table .strings/.stringsdict du même nom. Le chargeur dédié de la phase 6
+  lira explicitement cette table depuis kab.lproj.
+*/
+
+"app.name" = "Adhan Alarme";
+
+"home.greeting.morning" = "Tufat igerrzen";
+"home.greeting.afternoon" = "Azul";
+"home.greeting.evening" = "Tameddit igerrzen";
+
+"home.nextPrayer" = "Tazallit i d-iteddun";
+"home.in" = "Deg";
+"home.tomorrow" = "Azekka";
+"home.chooseCity" = "Fren tamdint";
+"home.location.current" = "Amkan n tura";
+
+"prayer.fajr" = "Lfajer";
+"prayer.sunrise" = "Ccuruq";
+"prayer.dhuhr" = "Ḍḍuher";
+"prayer.asr" = "Lɛaser";
+"prayer.maghrib" = "Lmeɣreb";
+"prayer.isha" = "Lɛica";
+
+"adhan.enabled" = "Adhan yermed";
+"adhan.disabled" = "Adhan yensa";
+"adhan.toggle.hint" = "Sit snat n tikkal i wakken ad ternuḍ neɣ ad tekksed ṣṣut n ladhan";
+
+"location.title" = "Amkan";
+"location.mode" = "Anaw";
+"location.automatic" = "Awurman";
+"location.automaticStatus.authorized" = "Amkan yermed";
+"location.automaticStatus.denied" = "Amkan yettwagi";
+"location.automaticStatus.notDetermined" = "Amkan ur yettwafren ara";
+"location.openSettings" = "Ldi Iɣewwaren";
+"location.search.placeholder" = "Tamdint neɣ code postal";
+"location.results" = "Ayen d-yeffɣen";
+"location.noResults" = "Ulac wayen";
+"location.cities" = "Timdinin-inu";
+"location.noCities" = "Nadi tamdint i wakken ad ternuḍ ɣer da.";
+
+"settings.title" = "Iɣewwaren";
+"settings.soon" = "Iɣewwaren ad d-asen deg uḥric i d-iteddun.";
+
+"common.close" = "Mdel";
+"common.retry" = "Ɛreḍ tikkelt-nniḍen";
+"common.loading" = "La itheggi…";
+
+"error.generic" = "Ur nezmir ara ad d-nawi wakud n tzallit.";
+"error.cityResolve" = "Ur nezmir ara ad nernu tamdint-a.";
+"audio.nowPlayingTitle" = "Adhan – %@";
+"settings.voice.section" = "Tighri n ladhan";
+"settings.voice.listen" = "Ssel";
+"settings.voice.pause" = "Seḥbes";
+"settings.voice.resume" = "Kemmel";
+"settings.voice.stop" = "Ḥbes";
+"settings.voice.download" = "Sider";
+"settings.voice.delete" = "Kkes";
+"settings.voice.downloading" = "Asider…";
+"settings.voice.status.bundled" = "Telha deg uḥars";
+"settings.voice.status.downloaded" = "Tusidert";
+"settings.voice.status.remote" = "I sider";
+"settings.voice.status.unavailable" = "Ulac-it";
+"audio.error.unavailable" = "Tighri-ya ur tusidir ara. Sider-itt uqbel.";
+"audio.error.notConfigured" = "Ulac aɣbalu n tighri-ya.";
+"audio.error.downloadFailed" = "Yexṣer usider. Ɛreḍ tikkelt-nniḍen.";
+"audio.error.sessionFailed" = "Ur nezmir ara ad nsel tighri (tilifun?).";
+"audio.error.unreadable" = "Afaylu n tighri yexṣer.";
+"audio.error.failed" = "Tighri ur teddi ara.";
+"alert.notification.body" = "Yewweḍ wakud n tzallit.";
+"alert.action.listen" = "Ssel ladhan";
+"settings.alerts.denied" = "Tilɣa twakksent — serrḥ-iten deg Iɣewwaren i wakken ad taweḍ ladhan.";
+"settings.alerts.enabled" = "Tilɣa";
+"settings.alerts.mode.adhan" = "Ladhan";
+"settings.alerts.mode.notification" = "Talɣa";
+"settings.alerts.mode.silent" = "Asusam";
+"settings.alerts.openSettings" = "Ldi Iɣewwaren";
+"settings.alerts.section" = "Tilɣa n tzallit";
+"asr.hanafi" = "Ḥanafi (tili ×2)";
+"asr.standard" = "Standard (tili ×1)";
+"highLatitude.angleBased" = "S lqiyas n tezɣelt";
+"highLatitude.middleOfNight" = "Alemmas n yiḍ";
+"highLatitude.oneSeventh" = "Tsebɛit n yiḍ";
+"method.diyanet" = "Diyanet";
+"method.egyptian" = "Miṣr";
+"method.isna" = "ISNA";
+"method.jafari" = "Jaɛfari";
+"method.karachi" = "Karachi";
+"method.kuwait" = "Kkuwit";
+"method.muslimWorldLeague" = "Muslim World League";
+"method.qatar" = "Qaṭar";
+"method.singapore" = "Singapur";
+"method.tehran" = "Ṭehran";
+"method.ummAlQura" = "Umm al-Qura";
+"method.uoif" = "UOIF";
+"settings.calculation.adjustments" = "Iseɣtiyen";
+"settings.calculation.adjustmentsHint" = "Tusdadin ɣef wakuden yettwasiḍnen, i yal tzallit.";
+"settings.calculation.asr" = "Asiḍen n Lɛaṣer";
+"settings.calculation.customAngles" = "Tizɣal tudmawanin";
+"settings.calculation.defaultAngles" = "Err tizɣal n tarrayt";
+"settings.calculation.fajrAngle" = "Tezɣelt n Lfajer";
+"settings.calculation.highLatitude" = "Latitude ʿlayen";
+"settings.calculation.ishaAngle" = "Tezɣelt n Lɛica";
+"settings.calculation.method" = "Tarrayt";
+"settings.calculation.section" = "Asiḍen n wakuden";
+"settings.calculation.minutesFormat" = "%+d tusdatin";
+"settings.alerts.longAdhan" = "Ladhan ɣezzifen (experimental)";
+"settings.alerts.longAdhanHint" = "Yeqqen tiktarin n 30 n tesdatin (≈ 8 tilɣa i yal tzallit). Ilaq asseɣret n taɣect.";
+"settings.alerts.longAdhanNeedsDownload" = "Sider taɣect uqbel ad serrḥeḍ Ladhan ɣezzifen.";
+"settings.alerts.preparingLongAdhan" = "Aseggeti n tiktarin…";
+"language.arabic" = "Taɛrabt";
+"language.english" = "Taglizit";
+"language.french" = "Tafransist";
+"language.kabyle" = "Taqbaylit";
+"language.system" = "Anagraw";
+"settings.language.language" = "Tutlayt n usnas";
+"settings.language.section" = "Tutlayt";
+"appearance.dark" = "Tallas";
+"appearance.light" = "Tafat";
+"appearance.system" = "Anagraw";
+"settings.appearance.appearance" = "Tignit";
+"settings.appearance.section" = "Tigni";
+"alert.voiceMissing.body" = "Sader taɣect seg yiɣewwaren iwakken ad tesleḍ ɣer Ladan.";
+"alert.voiceMissing.title" = "Ulac taɣect i Ladan";
+"settings.voice.custom" = "Ladan udmawan";
+"settings.voice.import" = "Ssekcem";
