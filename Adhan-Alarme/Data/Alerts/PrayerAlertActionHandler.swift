@@ -6,7 +6,7 @@ import UserNotifications
 private struct CompletionBox<Value>: @unchecked Sendable {
     private let handler: (Value) -> Void
 
-    init(_ handler: @escaping (Value) -> Void) {
+    nonisolated init(_ handler: @escaping (Value) -> Void) {
         self.handler = handler
     }
 

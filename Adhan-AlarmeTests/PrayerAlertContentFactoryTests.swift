@@ -5,6 +5,7 @@ import UserNotifications
 @testable import Adhan_Alarme
 
 /// Fabrique pure : titres pré-rendus, catégorie, niveau, son, `userInfo`.
+@MainActor
 struct PrayerAlertContentFactoryTests {
     private static let utc = TimeZone(identifier: "UTC") ?? .current
 

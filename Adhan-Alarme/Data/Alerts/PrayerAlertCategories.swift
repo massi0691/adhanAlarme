@@ -9,8 +9,8 @@ enum PrayerAlertCategories {
 
 /// Clés `userInfo` (valeurs plist : String/Double uniquement).
 enum PrayerAlertUserInfo {
-    static let prayer = "prayer"
-    static let muezzinID = "muezzinID"
-    static let mode = "mode"
-    static let fireDate = "fireDate"
+    nonisolated static let prayer = "prayer"
+    nonisolated static let muezzinID = "muezzinID"
+    nonisolated static let mode = "mode"
+    nonisolated static let fireDate = "fireDate"
 }

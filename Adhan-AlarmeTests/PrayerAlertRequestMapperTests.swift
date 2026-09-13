@@ -5,6 +5,7 @@ import UserNotifications
 @testable import Adhan_Alarme
 
 /// Mapper pur : identifiant stable + déclencheur calendaire exact, non répété.
+@MainActor
 struct PrayerAlertRequestMapperTests {
     private static let utc = TimeZone(identifier: "UTC") ?? .current
 
