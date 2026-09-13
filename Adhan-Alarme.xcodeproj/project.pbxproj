@@ -405,7 +405,6 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Nous utilisons votre position uniquement pour calculer les horaires de prière de votre ville.";
-				INFOPLIST_FILE = Adhan-Alarme/Info.plist;
 				INFOPLIST_KEY_UIBackgroundModes = "audio";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -441,7 +440,6 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Nous utilisons votre position uniquement pour calculer les horaires de prière de votre ville.";
-				INFOPLIST_FILE = Adhan-Alarme/Info.plist;
 				INFOPLIST_KEY_UIBackgroundModes = "audio";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
