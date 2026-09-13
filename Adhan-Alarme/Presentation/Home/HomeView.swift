@@ -7,6 +7,7 @@ struct HomeView: View {
     private let locationViewModel: LocationViewModel
     private let settingsViewModel: SettingsViewModel
     @State private var showingSettings = false
+    @State private var hasLoadedOnce = false
     @Environment(\.layoutDirection) private var layoutDirection
 
     init(viewModel: HomeViewModel, locationViewModel: LocationViewModel, settingsViewModel: SettingsViewModel) {
@@ -43,28 +44,66 @@ struct HomeView: View {
 
     @ViewBuilder
     private func content(now: Date) -> some View {
-        ScrollView {
-            VStack(spacing: DSSpacing.md) {
-                header(now: now)
-                switch viewModel.state {
-                case .loading:
-                    ProgressView {
-                        Text("common.loading")
+        ZStack {
+            ScrollView {
+                VStack(spacing: DSSpacing.md) {
+                    header(now: now)
+                    switch viewModel.state {
+                    case .loading:
+                        // Premier lancement : le splash plein écran couvre.
+                        // Rafraîchissements suivants : indicateur inline.
+                        if hasLoadedOnce {
+                            ProgressView {
+                                Text("common.loading")
+                            }
+                            .padding(.top, DSSpacing.xl)
+                        }
+                    case .loaded(let day):
+                        loadedContent(day: day, now: now)
+                    case .failed:
+                        failureContent
                     }
-                    .padding(.top, DSSpacing.xl)
-                case .loaded(let day):
-                    loadedContent(day: day, now: now)
-                case .failed:
-                    failureContent
                 }
+                .padding(DSSpacing.md)
             }
-            .padding(DSSpacing.md)
+            .background {
+                DSColors.homeBackground.ignoresSafeArea()
+            }
+            .refreshable {
+                await viewModel.load()
+            }
+            if case .loading = viewModel.state, !hasLoadedOnce {
+                splashView
+                    .transition(.opacity)
+            }
         }
-        .background {
-            DSColors.homeBackground.ignoresSafeArea()
+        .animation(.easeOut(duration: 0.35), value: viewModel.state)
+        .onChange(of: viewModel.state) { _, newState in
+            if newState != .loading {
+                hasLoadedOnce = true
+            }
         }
-        .refreshable {
-            await viewModel.load()
+    }
+
+    /// Écran de démarrage : mosquée plein écran (relais du storyboard
+    /// de lancement iOS), avec indicateur de chargement.
+    private var splashView: some View {
+        ZStack {
+            Image("SplashMosque")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+                .accessibilityHidden(true)
+            VStack {
+                Spacer()
+                ProgressView {
+                    Text("common.loading")
+                }
+                .tint(.white)
+                .foregroundStyle(.white)
+                .padding(.bottom, DSSpacing.xl * 2)
+            }
+            .ignoresSafeArea()
         }
     }
 

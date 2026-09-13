@@ -483,3 +483,14 @@ audio/notifications) restent `Sendable`. Les délégués ObjC
 - `⌘B` + `⌘U`, puis accueil en clair/sombre/système + arabe (RTL).
 - Bascules langue × apparence sans redémarrage ni flash.
 - Dynamic Type maximal : aucune troncature des médaillons.
+
+### 14.5 Écran de lancement
+- `LaunchScreen.storyboard` : mosquée plein écran (asset
+  `SplashMosque`, variantes clair/sombre automatiques), affiché
+  par iOS dès le tap sur l'icône.
+- Relais SwiftUI identique (`HomeView.splashView`) tant que le
+  premier chargement n'a pas abouti, avec indicateur et fondu à
+  l'apparition ; invisible lors des rafraîchissements suivants
+  (indicateur inline à la place).
+- Recette : cold start en thème clair puis sombre → mosquée plein
+  écran puis fondu vers l'accueil ; jamais de flash blanc/noir.
