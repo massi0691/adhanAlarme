@@ -31,4 +31,17 @@ enum Prayer: String, Sendable, Codable, CaseIterable, Identifiable, Hashable {
 
     /// `false` pour le lever du soleil, qui n'est pas une prière.
     var isObligatory: Bool { self != .sunrise }
+
+    /// Icône SF Symbols du moment (aube, soleil, crépuscule),
+    /// affichée dans les lignes d'horaires et la carte hero.
+    var iconName: String {
+        switch self {
+        case .fajr: "sunrise.fill"
+        case .sunrise: "sun.horizon.fill"
+        case .dhuhr: "sun.max.fill"
+        case .asr: "sun.min.fill"
+        case .maghrib: "sunset.fill"
+        case .isha: "moon.stars.fill"
+        }
+    }
 }
