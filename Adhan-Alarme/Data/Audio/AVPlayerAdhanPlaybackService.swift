@@ -37,7 +37,11 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
             queue: .main
         ) { [weak self] notification in
             guard let self else { return }
-            Task { @MainActor in self.handleInterruption(notification) }
+            // Swift 6 : `Notification` n'est pas `Sendable` — extraire les
+            // scalaires AVANT le saut vers le MainActor.
+            let rawType = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt
+            let rawOptions = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt
+            Task { @MainActor in self.handleInterruption(rawType: rawType, rawOptions: rawOptions) }
         }
         _ = center.addObserver(
             forName: AVAudioSession.routeChangeNotification,
@@ -45,7 +49,8 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
             queue: .main
         ) { [weak self] notification in
             guard let self else { return }
-            Task { @MainActor in self.handleRouteChange(notification) }
+            let rawReason = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt
+            Task { @MainActor in self.handleRouteChange(rawReason: rawReason) }
         }
         _ = center.addObserver(
             forName: AVPlayerItem.didPlayToEndTimeNotification,
@@ -53,7 +58,9 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
             queue: .main
         ) { [weak self] notification in
             guard let self else { return }
-            Task { @MainActor in self.handlePlaybackEnd(notification) }
+            // Identité `Sendable` de l'item (comparée à l'item courant sur le MainActor).
+            let itemID = (notification.object as? AVPlayerItem).map(ObjectIdentifier.init)
+            Task { @MainActor in self.handlePlaybackEnd(itemID: itemID) }
         }
         _ = center.addObserver(
             forName: AVPlayerItem.failedToPlayToEndTimeNotification,
@@ -61,7 +68,8 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
             queue: .main
         ) { [weak self] notification in
             guard let self else { return }
-            Task { @MainActor in self.handlePlaybackFailure(notification) }
+            let itemID = (notification.object as? AVPlayerItem).map(ObjectIdentifier.init)
+            Task { @MainActor in self.handlePlaybackFailure(itemID: itemID) }
         }
     }
 
@@ -130,9 +138,8 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
 
     // MARK: - Interruptions et routes
 
-    private func handleInterruption(_ notification: Notification) {
-        guard let rawType = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
-              let type = AVAudioSession.InterruptionType(rawValue: rawType) else { return }
+    private func handleInterruption(rawType: UInt?, rawOptions: UInt?) {
+        guard let rawType, let type = AVAudioSession.InterruptionType(rawValue: rawType) else { return }
         switch type {
         case .began:
             if case .playing = state {
@@ -142,8 +149,7 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
                 wasPlayingBeforeInterruption = false
             }
         case .ended:
-            let rawOptions = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
-            let options = AVAudioSession.InterruptionOptions(rawValue: rawOptions)
+            let options = AVAudioSession.InterruptionOptions(rawValue: rawOptions ?? 0)
             if wasPlayingBeforeInterruption, options.contains(.shouldResume) {
                 resume()
             }
@@ -153,22 +159,21 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
         }
     }
 
-    private func handleRouteChange(_ notification: Notification) {
-        guard let rawReason = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
-              let reason = AVAudioSession.RouteChangeReason(rawValue: rawReason) else { return }
+    private func handleRouteChange(rawReason: UInt?) {
+        guard let rawReason, let reason = AVAudioSession.RouteChangeReason(rawValue: rawReason) else { return }
         // Casque débranché : pause (jamais de haut-parleur surprise).
         if reason == .oldDeviceUnavailable {
             pause()
         }
     }
 
-    private func handlePlaybackEnd(_ notification: Notification) {
-        guard notification.object as? AVPlayerItem === player?.currentItem else { return }
+    private func handlePlaybackEnd(itemID: ObjectIdentifier?) {
+        guard let itemID, let current = player?.currentItem, ObjectIdentifier(current) == itemID else { return }
         finishNaturally()
     }
 
-    private func handlePlaybackFailure(_ notification: Notification) {
-        guard notification.object as? AVPlayerItem === player?.currentItem else { return }
+    private func handlePlaybackFailure(itemID: ObjectIdentifier?) {
+        guard let itemID, let current = player?.currentItem, ObjectIdentifier(current) == itemID else { return }
         finishNaturally()
     }
 
