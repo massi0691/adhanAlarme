@@ -14,21 +14,25 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: { sectionHeader("settings.language.section", icon: "globe") }) {
+                Section {
                     Picker("settings.language.language", selection: languageBinding()) {
                         ForEach(AppLanguage.allCases, id: \.self) { language in
                             Text(LocalizedStringKey(language.titleKey)).tag(language)
                         }
                     }
+                } header: {
+                    sectionHeader("settings.language.section", icon: "globe")
                 }
-                Section(header: { sectionHeader("settings.appearance.section", icon: "circle.lefthalf.filled") }) {
+                Section {
                     Picker("settings.appearance.appearance", selection: appearanceBinding()) {
                         ForEach(AppAppearance.allCases, id: \.self) { appearance in
                             Text(LocalizedStringKey(appearance.titleKey)).tag(appearance)
                         }
                     }
+                } header: {
+                    sectionHeader("settings.appearance.section", icon: "circle.lefthalf.filled")
                 }
-                Section(header: { sectionHeader("settings.calculation.section", icon: "function") }) {
+                Section {
                     Picker("settings.calculation.method", selection: methodBinding()) {
                         ForEach(CalculationMethod.allCases, id: \.self) { method in
                             Text(LocalizedStringKey(method.titleKey)).tag(method)
@@ -69,8 +73,10 @@ struct SettingsView: View {
                     NavigationLink("settings.calculation.adjustments") {
                         CalculationAdjustmentsView(viewModel: viewModel)
                     }
+                } header: {
+                    sectionHeader("settings.calculation.section", icon: "function")
                 }
-                Section(header: { sectionHeader("settings.alerts.section", icon: "bell") }) {
+                Section {
                     Toggle("settings.alerts.enabled", isOn: Binding(
                         get: { viewModel.alertsEnabled },
                         set: { enabled in
@@ -120,11 +126,15 @@ struct SettingsView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                } header: {
+                    sectionHeader("settings.alerts.section", icon: "bell")
                 }
-                Section(header: { sectionHeader("settings.voice.section", icon: "speaker.wave.2") }) {
+                Section {
                     ForEach(viewModel.voices) { muezzin in
                         voiceRow(muezzin)
                     }
+                } header: {
+                    sectionHeader("settings.voice.section", icon: "speaker.wave.2")
                 }
                 if let errorKey = viewModel.errorKey {
                     Section {
