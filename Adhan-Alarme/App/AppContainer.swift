@@ -52,6 +52,7 @@ final class AppContainer {
 
     static var production: AppContainer {
         let settings = UserDefaultsSettingsStore()
+        let languageSettings = LanguageSettings(settingsStore: settings)
         let cities = UserDefaultsCityStore()
         let location = CoreLocationService()
         let search = MapKitCitySearchService()
@@ -68,10 +69,9 @@ final class AppContainer {
             cache: PrayerTimesCache()
         )
         let audioStore = FileSystemMuezzinAudioStore()
-        let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore)
+        let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore, language: languageSettings)
         let alerts = LocalPrayerAlertService(language: languageSettings)
         let alertHandler = PrayerAlertActionHandler(playback: playback, alerts: alerts)
-        let languageSettings = LanguageSettings(settingsStore: settings)
         let container = AppContainer(
             settingsStore: settings,
             cityStore: cities,
@@ -93,6 +93,7 @@ final class AppContainer {
     static var preview: AppContainer {
         let previewDefaults = UserDefaults(suiteName: "preview") ?? .standard
         let settings = UserDefaultsSettingsStore(userDefaults: previewDefaults)
+        let languageSettings = LanguageSettings(settingsStore: settings)
         let cities = UserDefaultsCityStore(userDefaults: previewDefaults)
         let location = CoreLocationService()
         let search = MapKitCitySearchService()
@@ -104,10 +105,9 @@ final class AppContainer {
             cache: PrayerTimesCache(userDefaults: previewDefaults)
         )
         let audioStore = FileSystemMuezzinAudioStore()
-        let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore)
+        let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore, language: languageSettings)
         let alerts = LocalPrayerAlertService(language: languageSettings)
         let alertHandler = PrayerAlertActionHandler(playback: playback, alerts: alerts)
-        let languageSettings = LanguageSettings(settingsStore: settings)
         return AppContainer(
             settingsStore: settings,
             cityStore: cities,

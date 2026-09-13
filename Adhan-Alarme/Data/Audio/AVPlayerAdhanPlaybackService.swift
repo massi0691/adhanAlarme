@@ -13,6 +13,8 @@ import Observation
 @Observable
 final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
     private let audioStore: any MuezzinAudioStore
+    /// Langue de l'app (`nil` = tests/outils → locale appareil).
+    private let language: LanguageSettings?
     private let nowPlaying: AdhanNowPlayingController
     private var player: AVPlayer?
     private var currentMuezzinID: String?
@@ -24,10 +26,12 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
 
     init(
         audioStore: any MuezzinAudioStore,
-        nowPlaying: AdhanNowPlayingController = AdhanNowPlayingController()
+        nowPlaying: AdhanNowPlayingController = AdhanNowPlayingController(),
+        language: LanguageSettings? = nil
     ) {
         self.audioStore = audioStore
         self.nowPlaying = nowPlaying
+        self.language = language
         nowPlaying.onPlay = { [weak self] in self?.resume() }
         nowPlaying.onPause = { [weak self] in self?.pause() }
         let center = NotificationCenter.default
@@ -107,7 +111,12 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
         self.player = player
         currentMuezzinID = muezzin.id
         currentDuration = durationSeconds
-        let title = String(format: String(localized: "audio.nowPlayingTitle"), muezzin.name)
+        let format = if let appLanguage = language?.appLanguage {
+            AppLocalization.string(forKey: "audio.nowPlayingTitle", language: appLanguage)
+        } else {
+            Bundle.main.localizedString(forKey: "audio.nowPlayingTitle", value: nil, table: nil)
+        }
+        let title = String(format: format, muezzin.name)
         currentTitle = title
         player.play()
         state = .playing(muezzinID: muezzin.id)
