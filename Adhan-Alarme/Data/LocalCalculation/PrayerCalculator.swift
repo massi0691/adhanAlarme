@@ -87,7 +87,7 @@ struct PrayerCalculator: Sendable {
             parameters: parameters
         )
 
-        func date(at hour: Double) throws -> Date {
+        func makeDate(at: hour: Double) throws -> Date {
             // Arrondi à la minute ; le dépassement de minuit est géré par le calendrier.
             let totalMinutes = Int((SolarCalculator.fixHour(hour) * 60).rounded())
             guard let result = calendar.date(byAdding: .minute, value: totalMinutes, to: startOfDay) else {
@@ -99,12 +99,12 @@ struct PrayerCalculator: Sendable {
         return PrayerTimes(
             date: startOfDay,
             timeZone: timeZone,
-            fajr: try date(at: fajr),
-            sunrise: try date(at: sunrise),
-            dhuhr: try date(at: dhuhr),
-            asr: try date(at: asr),
-            maghrib: try date(at: maghrib),
-            isha: try date(at: isha)
+            fajr: try makeDate(at: fajr),
+            sunrise: try makeDate(at: sunrise),
+            dhuhr: try makeDate(at: dhuhr),
+            asr: try makeDate(at: asr),
+            maghrib: try makeDate(at: maghrib),
+            isha: try makeDate(at: isha)
         )
     }
 
