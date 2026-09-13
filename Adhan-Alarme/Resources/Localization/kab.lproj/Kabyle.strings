@@ -125,3 +125,5 @@
 "appearance.system" = "Anagraw";
 "settings.appearance.appearance" = "Tignit";
 "settings.appearance.section" = "Tigni";
+"alert.voiceMissing.body" = "Sader taɣect seg yiɣewwaren iwakken ad tesleḍ ɣer Ladan.";
+"alert.voiceMissing.title" = "Ulac taɣect i Ladan";

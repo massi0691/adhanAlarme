@@ -69,6 +69,21 @@ final class LocalPrayerAlertService: PrayerAlertService {
         center.removeAllPendingNotificationRequests()
     }
 
+    func notifyVoiceMissing() async {
+        guard await authorizationStatus().canSchedule else { return }
+        let language = language.appLanguage
+        let content = UNMutableNotificationContent()
+        content.title = AppLocalization.string(forKey: "alert.voiceMissing.title", language: language)
+        content.body = AppLocalization.string(forKey: "alert.voiceMissing.body", language: language)
+        content.sound = .default
+        let request = UNNotificationRequest(
+            identifier: "adhan.voice-missing",
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        )
+        try? await center.add(request)
+    }
+
     func cancelChainedSegments(dayIdentifier: String) async {
         let pending = await center.pendingNotificationRequests()
         let identifiers = pending.map(\.identifier).filter { $0.hasPrefix(dayIdentifier) }

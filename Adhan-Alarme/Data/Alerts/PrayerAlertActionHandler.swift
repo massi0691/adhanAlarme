@@ -85,7 +85,11 @@ final class PrayerAlertActionHandler: NSObject, UNUserNotificationCenterDelegate
             await self.cancelRemainingSegments(prayer: prayer, fireInterval: fireInterval)
             if action == PrayerAlertCategories.listenAction,
                let muezzin = muezzinID.flatMap(Muezzin.withID) ?? Muezzin.withID(Muezzin.defaultID) {
-                try? await self.playback.playAdhan(muezzin)
+                do {
+                    try await self.playback.playAdhan(muezzin)
+                } catch {
+                    await self.alerts.notifyVoiceMissing()
+                }
             }
             completion.call()
         }

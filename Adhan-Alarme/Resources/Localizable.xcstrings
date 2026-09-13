@@ -111,6 +111,50 @@
         }
       }
     },
+    "alert.voiceMissing.body": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Téléchargez une voix dans Réglages pour écouter l'Adhan."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download a voice in Settings to hear the Adhan."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حمّل صوتاً من الإعدادات للاستماع إلى الأذان."
+          }
+        }
+      }
+    },
+    "alert.voiceMissing.title": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune voix disponible"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No voice available"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد صوت متاح"
+          }
+        }
+      }
+    },
     "app.name": {
       "localizations": {
         "ar": {

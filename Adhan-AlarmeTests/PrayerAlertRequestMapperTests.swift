@@ -62,5 +62,6 @@ struct PrayerAlertRequestMapperTests {
         }
         #expect(trigger.dateComponents.hour == 5)
         #expect(trigger.dateComponents.day == 13)
+        #expect(trigger.dateComponents.timeZone?.identifier == paris.identifier)
     }
 }

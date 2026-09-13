@@ -87,7 +87,7 @@ final class HomeViewModel {
             adhanEnabled = settingsStore.settings.globalAdhanEnabled
             state = .loaded(PrayerDay(times: today, next: next))
             await ensureAlertsAuthorization()
-            await scheduleAlertsIfNeeded(for: today, now: now)
+            await scheduleAlertsIfNeeded(for: today, now: now, location: location)
         } catch {
             state = .failed
         }
@@ -100,14 +100,15 @@ final class HomeViewModel {
         Task { await refreshAlerts() }
     }
 
-    private var lastScheduledDayID: String?
+    private var lastScheduleSignature: String?
 
     /// Replanifie après un changement (bascule globale).
     private func refreshAlerts() async {
-        lastScheduledDayID = nil
+        lastScheduleSignature = nil
         await ensureAlertsAuthorization()
         guard case .loaded(let day) = state else { return }
-        await scheduleAlertsIfNeeded(for: day.times, now: Date())
+        guard let location = try? await resolver.resolveActiveLocation() else { return }
+        await scheduleAlertsIfNeeded(for: day.times, now: Date(), location: location)
     }
 
     /// Si les alertes sont activées mais jamais autorisées : demande
@@ -119,15 +120,17 @@ final class HomeViewModel {
         _ = await alertService.requestAuthorization()
     }
 
-    /// Planifie après un chargement réussi, une seule fois par jour.
+    /// Planifie après un chargement réussi, une seule fois par jour,
+    /// lieu et fuseau (un voyage replanifie le jour même).
     /// Best-effort : l'affichage ne dépend pas des alertes.
-    private func scheduleAlertsIfNeeded(for day: PrayerTimes, now: Date) async {
+    private func scheduleAlertsIfNeeded(for day: PrayerTimes, now: Date, location: ActiveLocation) async {
         let dayID = Self.dayIDFormatter.string(from: day.date)
-        guard dayID != lastScheduledDayID else { return }
+        let signature = Self.scheduleSignature(dayID: dayID, location: location)
+        guard signature != lastScheduleSignature else { return }
         do {
             let requests = try await alertScheduler.execute(now: now, settings: settingsStore.settings)
             try await alertService.schedule(requests)
-            lastScheduledDayID = dayID
+            lastScheduleSignature = signature
         } catch {
             // Refus système : l'interrupteur repasse à OFF (état véridique ;
             // réactivation depuis Réglages après autorisation dans iOS).
@@ -145,6 +148,13 @@ final class HomeViewModel {
         formatter.timeZone = TimeZone(identifier: "UTC")
         return formatter
     }()
+
+    /// Signature jour + fuseau + position (~1 km : absorbe le jitter GPS).
+    private static func scheduleSignature(dayID: String, location: ActiveLocation) -> String {
+        let latitude = (location.coordinates.latitude * 100).rounded() / 100
+        let longitude = (location.coordinates.longitude * 100).rounded() / 100
+        return "\(dayID)|\(location.timeZone.identifier)|\(latitude),\(longitude)"
+    }
 
     /// Resynchronise l'interrupteur (modifié depuis Réglages).
     func syncAdhanFlag() {

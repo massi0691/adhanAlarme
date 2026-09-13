@@ -10,10 +10,14 @@ enum PrayerAlertRequestMapper {
     ) -> UNNotificationRequest {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = request.timeZone
-        let components = calendar.dateComponents(
+        var components = calendar.dateComponents(
             [.year, .month, .day, .hour, .minute, .second],
             from: request.fireDate
         )
+        // Fuseau explicite : le déclencheur reste déterministe même si
+        // l'appareil voyage entre la planification et l'échéance.
+        components.calendar = calendar
+        components.timeZone = request.timeZone
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
         return UNNotificationRequest(identifier: request.identifier, content: content, trigger: trigger)
     }

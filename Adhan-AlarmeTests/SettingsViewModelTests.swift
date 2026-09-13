@@ -62,6 +62,8 @@ struct SettingsViewModelTests {
         }
         func schedule(_ requests: [PrayerAlertRequest]) async throws { scheduled.append(requests) }
         func cancelAllAlerts() async {}
+        var voiceMissingNotifications = 0
+        func notifyVoiceMissing() async { voiceMissingNotifications += 1 }
         func cancelChainedSegments(dayIdentifier: String) async { cancelledPrefixes.append(dayIdentifier) }
     }
 

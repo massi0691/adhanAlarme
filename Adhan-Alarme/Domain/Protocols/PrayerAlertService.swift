@@ -13,8 +13,16 @@ protocol PrayerAlertService {
     /// Erreurs : `permissionDenied`, `schedulingFailed`.
     func schedule(_ requests: [PrayerAlertRequest]) async throws
     func cancelAllAlerts() async
+    /// Avertit que l'écoute est impossible (aucune voix disponible) :
+    /// notification immédiate invitant à télécharger une voix.
+    func notifyVoiceMissing() async
     /// Annule les segments restants d'une occurrence (Adhan long),
     /// par préfixe `adhan.<prière>.<AAAAMMJJ>` (voir `dayIdentifier`).
     /// Sans effet sur les notifications uniques déjà tirées.
     func cancelChainedSegments(dayIdentifier: String) async
+}
+
+extension PrayerAlertService {
+    /// Défaut sans effet (les doublures de test surchargent si besoin).
+    func notifyVoiceMissing() async {}
 }
