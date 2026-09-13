@@ -16,6 +16,15 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // Erreurs en tête : visibles aussitôt (l'échec d'une
+                // action — ex. Adhan long refusé — ne doit pas se
+                // perdre en bas du formulaire).
+                if let errorKey = viewModel.errorKey {
+                    Section {
+                        Text(LocalizedStringKey(errorKey))
+                            .foregroundStyle(.red)
+                    }
+                }
                 Section {
                     Picker("settings.language.language", selection: languageBinding()) {
                         ForEach(AppLanguage.allCases, id: \.self) { language in
@@ -137,12 +146,6 @@ struct SettingsView: View {
                     }
                 } header: {
                     sectionHeader("settings.voice.section", icon: "speaker.wave.2")
-                }
-                if let errorKey = viewModel.errorKey {
-                    Section {
-                        Text(LocalizedStringKey(errorKey))
-                            .foregroundStyle(.red)
-                    }
                 }
             }
             .navigationTitle("settings.title")
