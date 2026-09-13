@@ -19,6 +19,8 @@ final class AppContainer {
     private let playbackService: any AdhanPlaybackService
     private let alertService: any PrayerAlertService
     private let alertActionHandler: PrayerAlertActionHandler
+    /// Langue de l'interface (observable, lue par l'app et les services).
+    let languageSettings: LanguageSettings
 
     init(
         settingsStore: any SettingsStoring,
@@ -31,7 +33,8 @@ final class AppContainer {
         audioStore: any MuezzinAudioStore,
         playbackService: any AdhanPlaybackService,
         alertService: any PrayerAlertService,
-        alertActionHandler: PrayerAlertActionHandler
+        alertActionHandler: PrayerAlertActionHandler,
+        languageSettings: LanguageSettings
     ) {
         self.settingsStore = settingsStore
         self.cityStore = cityStore
@@ -44,6 +47,7 @@ final class AppContainer {
         self.playbackService = playbackService
         self.alertService = alertService
         self.alertActionHandler = alertActionHandler
+        self.languageSettings = languageSettings
     }
 
     static var production: AppContainer {
@@ -67,6 +71,7 @@ final class AppContainer {
         let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore)
         let alerts = LocalPrayerAlertService()
         let alertHandler = PrayerAlertActionHandler(playback: playback, alerts: alerts)
+        let languageSettings = LanguageSettings(settingsStore: settings)
         let container = AppContainer(
             settingsStore: settings,
             cityStore: cities,
@@ -78,7 +83,8 @@ final class AppContainer {
             audioStore: audioStore,
             playbackService: playback,
             alertService: alerts,
-            alertActionHandler: alertHandler
+            alertActionHandler: alertHandler,
+            languageSettings: languageSettings
         )
         UNUserNotificationCenter.current().delegate = alertHandler
         return container
@@ -101,6 +107,7 @@ final class AppContainer {
         let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore)
         let alerts = LocalPrayerAlertService()
         let alertHandler = PrayerAlertActionHandler(playback: playback, alerts: alerts)
+        let languageSettings = LanguageSettings(settingsStore: settings)
         return AppContainer(
             settingsStore: settings,
             cityStore: cities,
@@ -112,7 +119,8 @@ final class AppContainer {
             audioStore: audioStore,
             playbackService: playback,
             alertService: alerts,
-            alertActionHandler: alertHandler
+            alertActionHandler: alertHandler,
+            languageSettings: languageSettings
         )
     }
 
