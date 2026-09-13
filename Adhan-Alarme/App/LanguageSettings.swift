@@ -22,7 +22,7 @@ final class LanguageSettings {
         appLanguage = language
         var settings = settingsStore.settings
         settings.appLanguage = language
-        try? settingsStore.save(settings)
+        settingsStore.settings = settings
     }
 
     /// Locale SwiftUI (`nil` = suivre l'appareil).
