@@ -16,6 +16,8 @@ struct AVPlayerAdhanPlaybackServiceTests {
             AsyncThrowingStream { $0.finish() }
         }
         func deleteDownload(of muezzin: Muezzin) throws {}
+        func validateDownload(of muezzin: Muezzin) async throws {}
+        func importCustomAudio(from sourceURL: URL) async throws {}
     }
 
     private func voice(remoteURL: URL? = nil) -> Muezzin {

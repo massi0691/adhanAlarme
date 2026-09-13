@@ -29,7 +29,15 @@ struct Muezzin: Sendable, Codable, Hashable, Identifiable {
 
     static let defaultID = "makkah"
 
+    /// Identifiant de la voix personnelle (fichier importé par l'utilisateur).
+    static let customID = "custom"
+
+    /// Entrée « Adhan personnel » : le magasin résout le fichier importé
+    /// par balayage (`custom-adhan.*`), quel que soit son format.
+    static let custom = Muezzin(id: customID, name: "Custom", audioFile: "custom-adhan.mp3", remoteURL: nil, language: nil, duration: nil)
+
     static func withID(_ id: String) -> Muezzin? {
-        catalog.first { $0.id == id }
+        if id == customID { return custom }
+        return catalog.first { $0.id == id }
     }
 }

@@ -17,7 +17,7 @@ final class SettingsViewModel {
     private let language: LanguageSettings
     private let appearanceSettings: AppearanceSettings
 
-    let voices: [Muezzin] = Muezzin.catalog
+    let voices: [Muezzin] = Muezzin.catalog + [Muezzin.custom]
     private(set) var selectedMuezzinID: String
     private(set) var availability: [String: MuezzinAudioAvailability] = [:]
     private(set) var downloadProgress: [String: Double] = [:]
@@ -138,6 +138,20 @@ final class SettingsViewModel {
                 playback.stop()
             }
             try audioStore.deleteDownload(of: muezzin)
+        } catch {
+            errorKey = "audio.error.failed"
+        }
+        refreshAvailability()
+    }
+
+    /// Importe un fichier audio personnel comme voix d'Adhan.
+    func importCustomAudio(from url: URL) async {
+        errorKey = nil
+        if playbackState.activeMuezzinID == Muezzin.customID {
+            playback.stop()
+        }
+        do {
+            try await audioStore.importCustomAudio(from: url)
         } catch {
             errorKey = "audio.error.failed"
         }

@@ -134,4 +134,37 @@ struct FileSystemMuezzinAudioStoreTests {
         }
         #expect(store.localURL(for: voice()) == nil)
     }
+
+    @Test func importCustomAudioRejectsUnsupportedExtension() async throws {
+        let cache = try tempDir()
+        defer { try? FileManager.default.removeItem(at: cache) }
+        let source = cache.appendingPathComponent("note.txt")
+        try writeDummy("text", to: source)
+        let store = FileSystemMuezzinAudioStore(cacheDirectory: cache)
+        do {
+            try await store.importCustomAudio(from: source)
+            #expect(Bool(false), "aurait dû jeter")
+        } catch let error as AdhanPlaybackError {
+            #expect(error == .downloadFailed(muezzinID: "custom"))
+        } catch {
+            #expect(Bool(false), "mauvais type d'erreur")
+        }
+    }
+
+    @Test func importCustomAudioRemovesUnplayableFile() async throws {
+        let cache = try tempDir()
+        defer { try? FileManager.default.removeItem(at: cache) }
+        let source = cache.appendingPathComponent("fake.mp3")
+        try writeDummy("not audio", to: source)
+        let store = FileSystemMuezzinAudioStore(cacheDirectory: cache)
+        do {
+            try await store.importCustomAudio(from: source)
+            #expect(Bool(false), "aurait dû jeter")
+        } catch let error as AdhanPlaybackError {
+            #expect(error == .downloadFailed(muezzinID: "custom"))
+        } catch {
+            #expect(Bool(false), "mauvais type d'erreur")
+        }
+        #expect(store.localURL(for: Muezzin.custom) == nil)
+    }
 }

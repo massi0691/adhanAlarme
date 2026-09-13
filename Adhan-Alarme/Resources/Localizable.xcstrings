@@ -2180,6 +2180,28 @@
         }
       }
     },
+    "settings.voice.custom": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adhan personnel"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personal Adhan"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أذان شخصي"
+          }
+        }
+      }
+    },
     "settings.voice.delete": {
       "localizations": {
         "ar": {
@@ -2242,6 +2264,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Téléchargement…"
+          }
+        }
+      }
+    },
+    "settings.voice.import": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "استيراد"
           }
         }
       }

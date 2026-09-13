@@ -28,6 +28,10 @@ struct SettingsViewModelTests {
         func validateDownload(of muezzin: Muezzin) async throws {
             validatedIDs.append(muezzin.id)
         }
+        var importedURLs: [URL] = []
+        func importCustomAudio(from sourceURL: URL) async throws {
+            importedURLs.append(sourceURL)
+        }
     }
 
     private final class MockPlayback: AdhanPlaybackService {
@@ -456,6 +460,18 @@ struct SettingsViewModelTests {
         }
         await world.viewModel.download(muezzin)
         #expect(store.validatedIDs == [muezzin.id])
+        #expect(world.viewModel.errorKey == nil)
+    }
+
+    @Test func importCustomAudioCallsStore() async {
+        let store = MockAudioStore()
+        guard let world = makeWorld(store: store) else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        let url = URL(fileURLWithPath: "/tmp/adhan.mp3")
+        await world.viewModel.importCustomAudio(from: url)
+        #expect(store.importedURLs == [url])
         #expect(world.viewModel.errorKey == nil)
     }
 }

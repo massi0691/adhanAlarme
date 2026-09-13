@@ -30,6 +30,9 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
     }
 
     func availability(of muezzin: Muezzin) -> MuezzinAudioAvailability {
+        if muezzin.id == Muezzin.customID {
+            return customURL() == nil ? .unavailable : .downloaded
+        }
         if bundleURL(for: muezzin) != nil { return .bundled }
         if fileManager.fileExists(atPath: cachedURL(for: muezzin).path(percentEncoded: false)) {
             return .downloaded
@@ -39,7 +42,8 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
     }
 
     func localURL(for muezzin: Muezzin) -> URL? {
-        bundleURL(for: muezzin) ?? cachedURLIfExists(for: muezzin)
+        if muezzin.id == Muezzin.customID { return customURL() }
+        return bundleURL(for: muezzin) ?? cachedURLIfExists(for: muezzin)
     }
 
     func download(_ muezzin: Muezzin) -> AsyncThrowingStream<Double, Error> {
@@ -63,9 +67,58 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
     }
 
     func deleteDownload(of muezzin: Muezzin) throws {
+        if muezzin.id == Muezzin.customID {
+            if let url = customURL() {
+                try fileManager.removeItem(at: url)
+            }
+            return
+        }
         let url = cachedURL(for: muezzin)
         guard fileManager.fileExists(atPath: url.path(percentEncoded: false)) else { return }
         try fileManager.removeItem(at: url)
+    }
+
+    /// Importe un fichier audio personnel (sélecteur Files) : nettoie
+    /// l'ancien, copie le nouveau (`custom-adhan.<ext>`), vérifie qu'il
+    /// est jouable. Formats : mp3, m4a/aac, wav, caf.
+    func importCustomAudio(from sourceURL: URL) async throws {
+        let ext = sourceURL.pathExtension.lowercased()
+        guard ["mp3", "m4a", "aac", "wav", "caf"].contains(ext) else {
+            throw AdhanPlaybackError.downloadFailed(muezzinID: Muezzin.customID)
+        }
+        let accessing = sourceURL.startAccessingSecurityScopedResource()
+        defer { if accessing { sourceURL.stopAccessingSecurityScopedResource() } }
+        try Self.prepareDirectory(cacheDirectory)
+        if let old = customURL() {
+            try? fileManager.removeItem(at: old)
+        }
+        let destination = cacheDirectory.appendingPathComponent("custom-adhan.\(ext)")
+        try fileManager.copyItem(at: sourceURL, to: destination)
+        guard await Self.isPlayable(url: destination) else {
+            try? fileManager.removeItem(at: destination)
+            throw AdhanPlaybackError.downloadFailed(muezzinID: Muezzin.customID)
+        }
+    }
+
+    /// Fichier personnel importé (`custom-adhan.*`), `nil` si aucun.
+    private func customURL() -> URL? {
+        let files = (try? fileManager.contentsOfDirectory(atPath: cacheDirectory.path(percentEncoded: false))) ?? []
+        guard let name = files.first(where: { $0.hasPrefix("custom-adhan.") }) else { return nil }
+        return cacheDirectory.appendingPathComponent(name)
+    }
+
+    /// Crée le dossier + exclusion sauvegarde (partagé import/téléchargement).
+    static func prepareDirectory(_ directory: URL) throws {
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let excluded = directory
+        var backupValues = URLResourceValues()
+        backupValues.isExcludedFromBackup = true
+        try? excluded.setResourceValues(backupValues)
+    }
+
+    /// Sonde de lisibilité partagée (import + validation).
+    private static func isPlayable(url: URL) async -> Bool {
+        (try? await AVURLAsset(url: url).load(.isPlayable)) ?? false
     }
 
     // MARK: - Résolution
@@ -93,9 +146,7 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
         guard let url = cachedURLIfExists(for: muezzin) else {
             throw AdhanPlaybackError.downloadFailed(muezzinID: muezzin.id)
         }
-        let asset = AVURLAsset(url: url)
-        let playable = (try? await asset.load(.isPlayable)) ?? false
-        guard playable else {
+        guard await Self.isPlayable(url: url) else {
             try? fileManager.removeItem(at: url)
             throw AdhanPlaybackError.downloadFailed(muezzinID: muezzin.id)
         }
@@ -137,12 +188,7 @@ private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unc
             }
             let manager = FileManager()
             let directory = destination.deletingLastPathComponent()
-            try manager.createDirectory(at: directory, withIntermediateDirectories: true)
-            // Contenu re-téléchargeable : exclu de la sauvegarde iCloud.
-            var excludedDirectory = directory
-            var backupValues = URLResourceValues()
-            backupValues.isExcludedFromBackup = true
-            try? excludedDirectory.setResourceValues(backupValues)
+            try FileSystemMuezzinAudioStore.prepareDirectory(directory)
             if manager.fileExists(atPath: destination.path(percentEncoded: false)) {
                 try manager.removeItem(at: destination)
             }

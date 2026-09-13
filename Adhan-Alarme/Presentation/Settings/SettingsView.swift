@@ -1,10 +1,12 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Écran Réglages (feuille depuis l'accueil) : langue, calcul des
 /// horaires (méthode, Asr, hautes latitudes, angles, ajustements),
 /// alertes par prière et voix de l'Adhan (sélection, téléchargement).
 struct SettingsView: View {
     @State private var viewModel: SettingsViewModel
+    @State private var showingImporter = false
     @Environment(\.dismiss) private var dismiss
 
     init(viewModel: SettingsViewModel) {
@@ -162,8 +164,13 @@ struct SettingsView: View {
                     viewModel.select(muezzin)
                 } label: {
                     HStack {
-                        Text(muezzin.name)
-                            .foregroundStyle(.primary)
+                        if muezzin.id == Muezzin.customID {
+                            Text("settings.voice.custom")
+                                .foregroundStyle(.primary)
+                        } else {
+                            Text(muezzin.name)
+                                .foregroundStyle(.primary)
+                        }
                         Spacer()
                         if viewModel.selectedMuezzinID == muezzin.id {
                             Image(systemName: "checkmark")
@@ -190,6 +197,11 @@ struct SettingsView: View {
                 }
             }
         }
+        .fileImporter(isPresented: $showingImporter, allowedContentTypes: [.audio]) { result in
+            if case .success(let url) = result {
+                Task { await viewModel.importCustomAudio(from: url) }
+            }
+        }
     }
 
     private func playButton(_ muezzin: Muezzin) -> some View {
@@ -213,8 +225,14 @@ struct SettingsView: View {
                 Task { await viewModel.download(muezzin) }
             }
             .disabled(viewModel.downloadProgress[muezzin.id] != nil)
-        case .bundled, .unavailable, nil:
+        case .bundled:
             EmptyView()
+        case .unavailable, nil:
+            if muezzin.id == Muezzin.customID {
+                Button("settings.voice.import") { showingImporter = true }
+            } else {
+                EmptyView()
+            }
         }
     }
 

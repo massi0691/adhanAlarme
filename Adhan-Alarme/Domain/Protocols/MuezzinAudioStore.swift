@@ -17,4 +17,6 @@ protocol MuezzinAudioStore {
     /// Valide un fichier téléchargé (jouable), sinon le supprime et
     /// jette `downloadFailed`.
     func validateDownload(of muezzin: Muezzin) async throws
+    /// Importe un fichier audio personnel (voix « Adhan personnel »).
+    func importCustomAudio(from sourceURL: URL) async throws
 }
