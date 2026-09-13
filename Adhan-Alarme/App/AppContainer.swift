@@ -37,7 +37,7 @@ final class AppContainer {
         let cities = UserDefaultsCityStore()
         let location = CoreLocationService()
         let search = MapKitCitySearchService()
-        let geocoder = CLGeocoderReverseGeocoder()
+        let geocoder = MapKitReverseGeocoder()
         let resolver = ActiveLocationResolver(
             settingsStore: settings,
             cityStore: cities,
@@ -66,7 +66,7 @@ final class AppContainer {
         let cities = UserDefaultsCityStore(userDefaults: previewDefaults)
         let location = CoreLocationService()
         let search = MapKitCitySearchService()
-        let geocoder = CLGeocoderReverseGeocoder()
+        let geocoder = MapKitReverseGeocoder()
         let local = LocalCalculationProvider()
         let repository = DefaultPrayerTimesRepository(
             api: local,

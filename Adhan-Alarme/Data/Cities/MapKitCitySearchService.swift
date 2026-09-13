@@ -37,29 +37,32 @@ final class MapKitCitySearchService: NSObject, CitySearching, MKLocalSearchCompl
         guard let item = response?.mapItems.first else {
             throw CitySearchError.noResults
         }
-        let placemark = item.placemark
+        let coordinate = item.location.coordinate
         let coordinates = Coordinates(
-            latitude: placemark.coordinate.latitude,
-            longitude: placemark.coordinate.longitude
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude
         )
         guard coordinates.isValid else { throw CitySearchError.resolutionFailed }
-        let timeZone = await resolveTimeZone(placemark: placemark, coordinates: coordinates)
+        // API MapKit iOS 26 : placemark déprécié → location + addressRepresentations.
+        let representations = item.addressRepresentations
+        let timeZone = await resolveTimeZone(item: item, coordinates: coordinates)
         return SavedCity(
-            name: placemark.locality ?? result.title,
-            country: placemark.country,
+            name: representations?.cityName ?? result.title,
+            country: representations?.regionName,
             coordinates: coordinates,
             timeZoneIdentifier: timeZone.identifier
         )
     }
 
-    private func resolveTimeZone(placemark: MKPlacemark, coordinates: Coordinates) async -> TimeZone {
-        if let zone = placemark.timeZone {
+    private func resolveTimeZone(item: MKMapItem, coordinates: Coordinates) async -> TimeZone {
+        if let zone = item.timeZone {
             return zone
         }
         // Secours : géocodage inverse (renseigne toujours le fuseau).
         let location = CLLocation(latitude: coordinates.latitude, longitude: coordinates.longitude)
-        if let placemarks = try? await CLGeocoder().reverseGeocodeLocation(location),
-           let zone = placemarks.first?.timeZone {
+        if let request = MKReverseGeocodingRequest(location: location),
+           let items = try? await request.mapItems,
+           let zone = items.first?.timeZone {
             return zone
         }
         return .current

@@ -44,7 +44,13 @@ final class CoreLocationService: NSObject, LocationProviding, CLLocationManagerD
     }
 
     func currentCoordinates() async throws -> Coordinates {
-        guard CLLocationManager.locationServicesEnabled() else {
+        // locationServicesEnabled() peut bloquer le thread appelant :
+        // exécuté hors main thread (recommandation Apple, sinon
+        // avertissement « UI unresponsiveness » au runtime).
+        let servicesEnabled = await Task.detached {
+            CLLocationManager.locationServicesEnabled()
+        }.value
+        guard servicesEnabled else {
             throw LocationError.serviceDisabled
         }
         switch authorizationStatus() {

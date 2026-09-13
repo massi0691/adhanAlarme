@@ -173,8 +173,10 @@ régions polaires (termes trigonométriques bornés, garde-fous NaN).
   suivi continu. Clé `NSLocationWhenInUseUsageDescription` via build
   setting + `InfoPlist.xcstrings` (en/fr/ar).
 - Recherche de villes via **MapKit** (`MKLocalSearchCompleter` +
-  `MKLocalSearch`) : gratuit, sans clé API, mondial. Fuseau via
-  `placemark.timeZone`, secours par géocodage inverse.
+  `MKLocalSearch`) : gratuit, sans clé API, mondial. API iOS 26
+  (`placemark`/`CLGeocoder` dépréciés) : ville via
+  `addressRepresentations.cityName`, pays via `regionName`, fuseau via
+  `MKMapItem.timeZone`, secours par `MKReverseGeocodingRequest`.
 - Cascade du résolveur : GPS → dernière position connue → ville active.
 - `CityStore` détient villes + ville active (source unique du mode
   manuel) ; réglages migrés v1→v2 sans perte (voir
