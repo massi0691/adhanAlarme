@@ -29,7 +29,8 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
     /// Journal de bord audio (Console.app, catégorie « audio ») : permet
     /// de trancher (interruption iOS, route, micro-coupure, arrêt
     /// demandé…) quand la lecture s'arrête hors de l'app, par exemple
-    /// au verrouillage de l'écran.
+    /// au verrouillage de l'écran. Niveau `info` : visible par défaut
+    /// dans Console.app (le niveau `debug` y est caché par défaut).
     private static let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier ?? "Adhan-Alarme",
         category: "audio"
@@ -119,7 +120,7 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
             return duration.seconds
         }()
         let bgModes = Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes")
-        Self.logger.debug("playAdhan \(muezzin.id, privacy: .public) bgmodes=\(String(describing: bgModes), privacy: .public)")
+        Self.logger.info("playAdhan \(muezzin.id, privacy: .public) bgmodes=\(String(describing: bgModes), privacy: .public)")
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, mode: .spokenAudio)
@@ -148,7 +149,7 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
     }
 
     func stop() {
-        Self.logger.debug("stop() appele (etat avant : \(String(describing: state), privacy: .public))")
+        Self.logger.info("stop() appele (etat avant : \(String(describing: state), privacy: .public))")
         finishNaturally()
     }
 
@@ -174,7 +175,7 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
 
     private func handleInterruption(rawType: UInt?, rawOptions: UInt?) {
         guard let rawType, let type = AVAudioSession.InterruptionType(rawValue: rawType) else { return }
-        Self.logger.debug("interruption \(String(describing: type), privacy: .public)")
+        Self.logger.info("interruption \(String(describing: type), privacy: .public)")
         switch type {
         case .began:
             if case .playing = state {
@@ -185,7 +186,7 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
             }
         case .ended:
             let options = AVAudioSession.InterruptionOptions(rawValue: rawOptions ?? 0)
-            Self.logger.debug("interruption finie, reprise systeme : \(options.contains(.shouldResume), privacy: .public)")
+            Self.logger.info("interruption finie, reprise systeme : \(options.contains(.shouldResume), privacy: .public)")
             if wasPlayingBeforeInterruption, options.contains(.shouldResume) {
                 resume()
             }
@@ -197,7 +198,7 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
 
     private func handleRouteChange(rawReason: UInt?) {
         guard let rawReason, let reason = AVAudioSession.RouteChangeReason(rawValue: rawReason) else { return }
-        Self.logger.debug("route audio : \(String(describing: reason), privacy: .public)")
+        Self.logger.info("route audio : \(String(describing: reason), privacy: .public)")
         // Casque débranché : pause (jamais de haut-parleur surprise).
         if reason == .oldDeviceUnavailable {
             pause()
@@ -206,7 +207,7 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
 
     private func handlePlaybackEnd(itemID: ObjectIdentifier?) {
         guard let itemID, let current = player?.currentItem, ObjectIdentifier(current) == itemID else { return }
-        Self.logger.debug("lecture terminee (fin de fichier)")
+        Self.logger.info("lecture terminee (fin de fichier)")
         finishNaturally()
     }
 
@@ -222,10 +223,10 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
         guard let itemID, let current = player?.currentItem, ObjectIdentifier(current) == itemID else { return }
         if stallRetries < 2, case .playing = state {
             stallRetries += 1
-            Self.logger.debug("micro-coupure, relance \(self.stallRetries, privacy: .public)/2")
+            Self.logger.info("micro-coupure, relance \(self.stallRetries, privacy: .public)/2")
             player?.play()
         } else {
-            Self.logger.debug("micro-coupure persistante, arret propre")
+            Self.logger.info("micro-coupure persistante, arret propre")
             finishNaturally()
         }
     }
