@@ -149,7 +149,7 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
     }
 
     func stop() {
-        Self.logger.info("stop() appele (etat avant : \(String(describing: state), privacy: .public))")
+        Self.logger.info("stop() appele (etat avant : \(String(describing: self.state), privacy: .public))")
         finishNaturally()
     }
 
