@@ -1,8 +1,11 @@
 /*
   Kabyle (kab) — TRADUCTIONS PROVISOIRES.
   À valider par un locuteur natif avant la phase 6.
-  Le kabyle n'est pas une langue système iOS : le sélecteur in-app et le
-  chargeur dédié seront implémentés en phase 6 (voir docs/ARCHITECTURE.md).
+
+  NOTE : la table s'appelle "Kabyle" (et non "Localizable") car Xcode
+  interdit la coexistence d'un catalogue Localizable.xcstrings avec une
+  table .strings/.stringsdict du même nom. Le chargeur dédié de la phase 6
+  lira explicitement cette table depuis kab.lproj.
 */
 
 "app.name" = "Adhan Alarme";

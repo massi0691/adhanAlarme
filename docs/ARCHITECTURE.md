@@ -44,7 +44,7 @@ Adhan-Alarme/
 │   └── Home/                       # HomeView + HomeViewModel
 └── Resources/
     ├── Localizable.xcstrings       # fr / en / ar
-    ├── Localization/kab.lproj/     # Kabyle (provisoire, phase 6)
+    ├── Localization/kab.lproj/Kabyle.strings  # Kabyle, table séparée (phase 6)
     └── Adhan/                      # Fichiers audio (phase 3, voir README)
 ```
 
@@ -84,13 +84,16 @@ compilé automatiquement, sans modification du `.pbxproj`.
 | Français| `fr`  | `Localizable.xcstrings` ✅            |
 | English | `en`  | `Localizable.xcstrings` (source) ✅   |
 | العربية | `ar`  | `Localizable.xcstrings` + RTL auto ✅ |
-| Kabyle  | `kab` | `kab.lproj/Localizable.strings` (provisoire, non branché) |
+| Kabyle  | `kab` | `kab.lproj/Kabyle.strings` (provisoire, non branché) |
 
 - Les vues utilisent **uniquement des clés** (`Text("home.nextPrayer")`),
   jamais de texte en dur. Les clés dynamiques passent par
   `Text(LocalizedStringKey(...))` (un `String` variable serait verbatim).
 - Le kabyle n'est pas une langue système iOS : la phase 6 ajoutera un
-  sélecteur in-app (`AppLanguage`) et un chargeur dédié lisant le `.lproj`.
+  sélecteur in-app (`AppLanguage`) et un chargeur dédié lisant explicitement
+  la table `Kabyle` depuis le `.lproj`. Ce nom de table est obligatoire :
+  Xcode interdit la coexistence d'un catalogue `.xcstrings` avec une table
+  `.strings` du même nom (`Localizable`).
 - Les traductions kabyles actuelles sont **provisoires** : validation par
   un locuteur natif requise avant publication.
 
