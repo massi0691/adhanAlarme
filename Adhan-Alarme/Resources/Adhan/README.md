@@ -35,3 +35,19 @@ Ordre de résolution : fichier bundle → cache téléchargé → téléchargeme
   `Muezzin.catalog` (URL https stable vers le MP3, source autorisée).
 - Téléchargement au premier plan avec progression (pas de session
   d'arrière-plan en v1 : l'app reste ouverte pendant le transfert).
+
+## Sources distantes configurées (assabile.com)
+
+Les 4 voix du catalogue téléchargent depuis les liens publics de la page
+https://www.assabile.com/adhan-call-prayer (« Listen and download ») :
+- Makkah → Ali Ibn Ahmad Mala, Haram (03:34)
+- Madinah → Haram de Médine (03:09)
+- Mishary Alafasy → Koweït (04:00)
+- Abdul Basit → Le Caire (03:20)
+
+⚠️ Droits et conditions : ces fichiers restent hébergés par le site
+source ; l'app ne les redistribue pas (téléchargement direct chez
+l'utilisateur final, cache local). Vérifiez que cet usage respecte les
+conditions du site (bande passante, hotlinking) et les droits des
+récitants ; pour la production, privilégiez une autorisation écrite ou
+votre propre hébergement. Les URLs se remplacent dans `Muezzin.catalog`.
