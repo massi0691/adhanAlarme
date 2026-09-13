@@ -133,6 +133,38 @@
         }
       }
     },
+    "asr.hanafi": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hanafi (ombre ×2)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hanafi (shadow ×2)"
+          }
+        }
+      }
+    },
+    "asr.standard": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standard (ombre ×1)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standard (shadow ×1)"
+          }
+        }
+      }
+    },
     "audio.error.downloadFailed": {
       "localizations": {
         "ar": {
@@ -394,6 +426,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Impossible de charger les horaires de prière."
+          }
+        }
+      }
+    },
+    "highLatitude.angleBased": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basée sur l'angle"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angle-based"
+          }
+        }
+      }
+    },
+    "highLatitude.middleOfNight": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Milieu de la nuit"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Middle of the night"
+          }
+        }
+      }
+    },
+    "highLatitude.oneSeventh": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un septième de la nuit"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One seventh of the night"
           }
         }
       }
@@ -838,6 +918,198 @@
         }
       }
     },
+    "method.diyanet": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diyanet (Turquie)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diyanet (Türkiye)"
+          }
+        }
+      }
+    },
+    "method.egyptian": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autorité égyptienne"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Egyptian General Authority"
+          }
+        }
+      }
+    },
+    "method.isna": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ISNA (Amérique du Nord)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ISNA (North America)"
+          }
+        }
+      }
+    },
+    "method.jafari": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jafari (chiite)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jafari (Shia)"
+          }
+        }
+      }
+    },
+    "method.karachi": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karachi (Pakistan)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karachi (Pakistan)"
+          }
+        }
+      }
+    },
+    "method.kuwait": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koweït"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuwait"
+          }
+        }
+      }
+    },
+    "method.muslimWorldLeague": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ligue islamique mondiale"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muslim World League"
+          }
+        }
+      }
+    },
+    "method.qatar": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qatar"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qatar"
+          }
+        }
+      }
+    },
+    "method.singapore": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Singapour"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Singapore"
+          }
+        }
+      }
+    },
+    "method.tehran": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Téhéran"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tehran"
+          }
+        }
+      }
+    },
+    "method.ummAlQura": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umm al-Qura (La Mecque)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umm al-Qura (Makkah)"
+          }
+        }
+      }
+    },
+    "method.uoif": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UOIF (France)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UOIF (France)"
+          }
+        }
+      }
+    },
     "prayer.asr": {
       "localizations": {
         "ar": {
@@ -1078,6 +1350,166 @@
           "stringUnit": {
             "state": "translated",
             "value": "Prayer alerts"
+          }
+        }
+      }
+    },
+    "settings.calculation.adjustments": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustements"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjustments"
+          }
+        }
+      }
+    },
+    "settings.calculation.adjustmentsHint": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minutes ajoutées aux horaires calculés, par prière."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minutes added to calculated times, per prayer."
+          }
+        }
+      }
+    },
+    "settings.calculation.asr": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calcul du Asr"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asr calculation"
+          }
+        }
+      }
+    },
+    "settings.calculation.customAngles": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angles personnalisés"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom angles"
+          }
+        }
+      }
+    },
+    "settings.calculation.defaultAngles": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reprendre les angles de la méthode"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use method angles"
+          }
+        }
+      }
+    },
+    "settings.calculation.fajrAngle": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angle Fajr"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fajr angle"
+          }
+        }
+      }
+    },
+    "settings.calculation.highLatitude": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hautes latitudes"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High latitudes"
+          }
+        }
+      }
+    },
+    "settings.calculation.ishaAngle": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angle Isha"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isha angle"
+          }
+        }
+      }
+    },
+    "settings.calculation.method": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Méthode"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Method"
+          }
+        }
+      }
+    },
+    "settings.calculation.section": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calcul des horaires"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time calculation"
           }
         }
       }
