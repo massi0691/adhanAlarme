@@ -72,3 +72,5 @@
 "audio.error.sessionFailed" = "Ur nezmir ara ad nsel tighri (tilifun?).";
 "audio.error.unreadable" = "Afaylu n tighri yexṣer.";
 "audio.error.failed" = "Tighri ur teddi ara.";
+"alert.notification.body" = "Yewweḍ wakud n tzallit.";
+"alert.action.listen" = "Ssel ladhan";
