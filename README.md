@@ -19,7 +19,9 @@ Limitations iOS (Adhan auto, 30 s, 64 notifications) :
 
 - [x] **Phase 1** — Architecture, modèles, Design System, écran d'accueil,
   localisation fr/en/ar (+ kabyle provisoire), tests unitaires
-- [ ] **Phase 2** — Calcul des horaires, localisation, villes manuelles
+- [x] **Phase 2** — Moteur astronomique local, API Aladhan + cache + fallback,
+  Core Location one-shot, recherche MapKit, villes sauvegardées, écran Position
+- [ ] **Phase 2 (Xcode)** — `⌘B` + `⌘U` : golden tests vs API réelle (±2 min)
 - [ ] **Phase 3** — Moteur Adhan (AVFoundation), Muadhins, lecture complète
 - [ ] **Phase 4** — Notifications, rolling schedule, réglages d'alerte
 - [ ] **Phase 5** — Méthodes de calcul, Asr, hautes latitudes, ajustements

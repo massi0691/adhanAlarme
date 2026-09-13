@@ -44,6 +44,16 @@ struct PrayerTimesTests {
         #expect(Prayer.sunrise.isObligatory == false)
         #expect(Prayer.allCases.filter(\.isObligatory).count == 5)
     }
+
+    @Test func applyingAdjustments_shiftsOnlyListedPrayers() async throws {
+        let original = fixture()
+        let shifted = original.applyingAdjustments([.fajr: 5, .isha: -3])
+
+        #expect(shifted.fajr == original.fajr.addingTimeInterval(300))
+        #expect(shifted.isha == original.isha.addingTimeInterval(-180))
+        #expect(shifted.dhuhr == original.dhuhr)
+        #expect(original.applyingAdjustments([:]) == original)
+    }
 }
 
 struct CoordinatesTests {

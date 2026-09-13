@@ -1,15 +1,21 @@
 import Foundation
 
-/// Dépôt simulé (phase 1) : horaires fixes et déterministes pour la journée
-/// demandée, dans le fuseau de l'appareil. Remplacé en phase 2 par la chaîne
-/// de fallback (API → cache → calcul local).
+/// Dépôt simulé : horaires fixes et déterministes pour la journée demandée,
+/// dans le fuseau fourni. Conservé pour d'éventuels tests d'intégration ;
+/// la production utilise `DefaultPrayerTimesRepository` depuis la phase 2.
 struct MockPrayerTimesRepository: PrayerTimesRepository {
     enum MockError: Error {
         case invalidDateComponents
     }
 
-    func prayerTimes(for date: Date) async throws -> PrayerTimes {
-        let calendar = Calendar.current
+    func fetchPrayerTimes(
+        date: Date,
+        coordinates: Coordinates,
+        timeZone: TimeZone,
+        configuration: PrayerCalculationConfiguration
+    ) async throws -> PrayerTimes {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
 
         func time(hour: Int, minute: Int) throws -> Date {
             var components = calendar.dateComponents([.year, .month, .day], from: date)
@@ -24,7 +30,7 @@ struct MockPrayerTimesRepository: PrayerTimesRepository {
 
         return PrayerTimes(
             date: calendar.startOfDay(for: date),
-            timeZone: calendar.timeZone,
+            timeZone: timeZone,
             fajr: try time(hour: 5, minute: 12),
             sunrise: try time(hour: 6, minute: 48),
             dhuhr: try time(hour: 12, minute: 47),

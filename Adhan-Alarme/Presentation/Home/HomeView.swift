@@ -1,27 +1,31 @@
 import SwiftUI
 
-/// Écran principal : salutation, ville, prochaine prière,
-/// compte à rebours, interrupteur Adhan et horaires du jour.
+/// Écran principal : salutation, ville (lien vers Position), prochaine
+/// prière, compte à rebours, interrupteur Adhan et horaires du jour.
 struct HomeView: View {
     @State private var viewModel: HomeViewModel
+    private let locationViewModel: LocationViewModel
     @State private var showingSettings = false
 
-    init(viewModel: HomeViewModel) {
+    init(viewModel: HomeViewModel, locationViewModel: LocationViewModel) {
         _viewModel = State(wrappedValue: viewModel)
+        self.locationViewModel = locationViewModel
     }
 
     var body: some View {
-        TimelineView(.everyMinute) { context in
-            content(now: context.date)
-                .onChange(of: context.date) { _, newDate in
-                    viewModel.refreshIfNeeded(now: newDate)
-                }
-        }
-        .task {
-            await viewModel.load()
-        }
-        .sheet(isPresented: $showingSettings) {
-            SettingsPlaceholderView()
+        NavigationStack {
+            TimelineView(.everyMinute) { context in
+                content(now: context.date)
+                    .onChange(of: context.date) { _, newDate in
+                        viewModel.refreshIfNeeded(now: newDate)
+                    }
+            }
+            .task {
+                await viewModel.load()
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsPlaceholderView()
+            }
         }
     }
 
@@ -55,13 +59,22 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: DSSpacing.xs) {
                 Text(LocalizedStringKey(greetingKey(for: now)))
                     .font(DSTypography.greeting)
-                Label {
-                    Text(viewModel.cityName)
-                } icon: {
-                    Image(systemName: "mappin.circle.fill")
+                NavigationLink {
+                    LocationView(viewModel: locationViewModel)
+                } label: {
+                    HStack(spacing: DSSpacing.xs) {
+                        Label {
+                            Text(viewModel.cityName)
+                        } icon: {
+                            Image(systemName: "mappin.circle.fill")
+                        }
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                    }
+                    .font(DSTypography.city)
+                    .foregroundStyle(DSColors.secondaryText)
                 }
-                .font(DSTypography.city)
-                .foregroundStyle(DSColors.secondaryText)
             }
             Spacer()
             Button {
@@ -106,6 +119,9 @@ struct HomeView: View {
                 Task { await viewModel.load() }
             }
             .buttonStyle(.bordered)
+            NavigationLink("home.chooseCity") {
+                LocationView(viewModel: locationViewModel)
+            }
         }
         .padding(.top, DSSpacing.xl)
     }
@@ -142,5 +158,8 @@ private struct SettingsPlaceholderView: View {
 }
 
 #Preview {
-    HomeView(viewModel: AppContainer.preview.makeHomeViewModel())
+    HomeView(
+        viewModel: AppContainer.preview.makeHomeViewModel(),
+        locationViewModel: AppContainer.preview.makeLocationViewModel()
+    )
 }

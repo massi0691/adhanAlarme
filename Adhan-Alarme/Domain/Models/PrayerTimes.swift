@@ -53,4 +53,23 @@ struct PrayerTimes: Sendable, Codable, Hashable {
     var orderedTimes: [(prayer: Prayer, date: Date)] {
         Prayer.allCases.map { ($0, time(for: $0)) }
     }
+
+    /// Décale chaque prière de son ajustement (minutes). Appliqué une seule
+    /// fois par le dépôt, après récupération (API, cache ou calcul local).
+    func applyingAdjustments(_ adjustments: [Prayer: Int]) -> PrayerTimes {
+        func shifted(_ date: Date, for prayer: Prayer) -> Date {
+            guard let minutes = adjustments[prayer], minutes != 0 else { return date }
+            return date.addingTimeInterval(TimeInterval(minutes * 60))
+        }
+        return PrayerTimes(
+            date: date,
+            timeZone: timeZone,
+            fajr: shifted(fajr, for: .fajr),
+            sunrise: shifted(sunrise, for: .sunrise),
+            dhuhr: shifted(dhuhr, for: .dhuhr),
+            asr: shifted(asr, for: .asr),
+            maghrib: shifted(maghrib, for: .maghrib),
+            isha: shifted(isha, for: .isha)
+        )
+    }
 }

@@ -1,37 +1,108 @@
 import Foundation
 
 /// Racine de composition (injection de dépendances).
-/// Phase 1 : dépôt simulé. Phase 2 : dépôt réel branché ici
-/// (API → cache → calcul local), sans toucher aux Views ni ViewModels.
+/// Production : dépôt réel (cache → API Aladhan → calcul local),
+/// localisation Core Location, recherche MapKit.
+/// Previews : calcul local uniquement, position figée (aucun réseau).
 @MainActor
 final class AppContainer {
     private let settingsStore: any SettingsStoring
+    private let cityStore: any CityStoring
+    private let locationService: any LocationProviding
+    private let searchService: any CitySearching
+    private let geocoder: any ReverseGeocoding
+    private let resolver: any ActiveLocationResolving
     private let prayerTimesRepository: any PrayerTimesRepository
 
-    init(settingsStore: any SettingsStoring, prayerTimesRepository: any PrayerTimesRepository) {
+    init(
+        settingsStore: any SettingsStoring,
+        cityStore: any CityStoring,
+        locationService: any LocationProviding,
+        searchService: any CitySearching,
+        geocoder: any ReverseGeocoding,
+        resolver: any ActiveLocationResolving,
+        prayerTimesRepository: any PrayerTimesRepository
+    ) {
         self.settingsStore = settingsStore
+        self.cityStore = cityStore
+        self.locationService = locationService
+        self.searchService = searchService
+        self.geocoder = geocoder
+        self.resolver = resolver
         self.prayerTimesRepository = prayerTimesRepository
     }
 
     static var production: AppContainer {
-        AppContainer(
-            settingsStore: UserDefaultsSettingsStore(),
-            prayerTimesRepository: MockPrayerTimesRepository()
+        let settings = UserDefaultsSettingsStore()
+        let cities = UserDefaultsCityStore()
+        let location = CoreLocationService()
+        let search = MapKitCitySearchService()
+        let geocoder = CLGeocoderReverseGeocoder()
+        let resolver = ActiveLocationResolver(
+            settingsStore: settings,
+            cityStore: cities,
+            locationService: location,
+            geocoder: geocoder
+        )
+        let repository = DefaultPrayerTimesRepository(
+            api: AladhanAPIProvider(),
+            local: LocalCalculationProvider(),
+            cache: PrayerTimesCache()
+        )
+        return AppContainer(
+            settingsStore: settings,
+            cityStore: cities,
+            locationService: location,
+            searchService: search,
+            geocoder: geocoder,
+            resolver: resolver,
+            prayerTimesRepository: repository
         )
     }
 
     static var preview: AppContainer {
         let previewDefaults = UserDefaults(suiteName: "preview") ?? .standard
+        let settings = UserDefaultsSettingsStore(userDefaults: previewDefaults)
+        let cities = UserDefaultsCityStore(userDefaults: previewDefaults)
+        let location = CoreLocationService()
+        let search = MapKitCitySearchService()
+        let geocoder = CLGeocoderReverseGeocoder()
+        let local = LocalCalculationProvider()
+        let repository = DefaultPrayerTimesRepository(
+            api: local,
+            local: local,
+            cache: PrayerTimesCache(userDefaults: previewDefaults)
+        )
         return AppContainer(
-            settingsStore: UserDefaultsSettingsStore(userDefaults: previewDefaults),
-            prayerTimesRepository: MockPrayerTimesRepository()
+            settingsStore: settings,
+            cityStore: cities,
+            locationService: location,
+            searchService: search,
+            geocoder: geocoder,
+            resolver: StaticLocationResolver(),
+            prayerTimesRepository: repository
         )
     }
 
     func makeHomeViewModel() -> HomeViewModel {
         HomeViewModel(
             getPrayerTimes: GetPrayerTimesUseCase(repository: prayerTimesRepository),
-            settingsStore: settingsStore
+            settingsStore: settingsStore,
+            resolver: resolver
+        )
+    }
+
+    func makeLocationViewModel() -> LocationViewModel {
+        LocationViewModel(
+            settingsStore: settingsStore,
+            cityStore: cityStore,
+            locationService: locationService,
+            searchService: searchService,
+            selectCity: SelectCityUseCase(
+                searchService: searchService,
+                cityStore: cityStore,
+                settingsStore: settingsStore
+            )
         )
     }
 }

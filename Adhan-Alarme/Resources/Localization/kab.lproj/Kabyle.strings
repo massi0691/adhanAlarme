@@ -17,6 +17,8 @@
 "home.nextPrayer" = "Tazallit i d-iteddun";
 "home.in" = "Deg";
 "home.tomorrow" = "Azekka";
+"home.chooseCity" = "Fren tamdint";
+"home.location.current" = "Amkan n tura";
 
 "prayer.fajr" = "Lfajer";
 "prayer.sunrise" = "Ccuruq";
@@ -29,6 +31,19 @@
 "adhan.disabled" = "Adhan yensa";
 "adhan.toggle.hint" = "Sit snat n tikkal i wakken ad ternuḍ neɣ ad tekksed ṣṣut n ladhan";
 
+"location.title" = "Amkan";
+"location.mode" = "Anaw";
+"location.automatic" = "Awurman";
+"location.automaticStatus.authorized" = "Amkan yermed";
+"location.automaticStatus.denied" = "Amkan yettwagi";
+"location.automaticStatus.notDetermined" = "Amkan ur yettwafren ara";
+"location.openSettings" = "Ldi Iɣewwaren";
+"location.search.placeholder" = "Tamdint neɣ code postal";
+"location.results" = "Ayen d-yeffɣen";
+"location.noResults" = "Ulac wayen";
+"location.cities" = "Timdinin-inu";
+"location.noCities" = "Nadi tamdint i wakken ad ternuḍ ɣer da.";
+
 "settings.title" = "Iɣewwaren";
 "settings.soon" = "Iɣewwaren ad d-asen deg uḥric i d-iteddun.";
 
@@ -37,3 +52,4 @@
 "common.loading" = "La itheggi…";
 
 "error.generic" = "Ur nezmir ara ad d-nawi wakud n tzallit.";
+"error.cityResolve" = "Ur nezmir ara ad nernu tamdint-a.";

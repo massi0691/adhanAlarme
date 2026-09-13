@@ -6,7 +6,10 @@ struct Adhan_AlarmeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView(viewModel: container.makeHomeViewModel())
+            HomeView(
+                viewModel: container.makeHomeViewModel(),
+                locationViewModel: container.makeLocationViewModel()
+            )
         }
     }
 }

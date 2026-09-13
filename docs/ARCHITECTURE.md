@@ -114,3 +114,86 @@ compilé automatiquement, sans modification du `.pbxproj`.
 **Recommandation avant publication** : abaisser à **iOS 18** (ou 17 minimum
 pour `@Observable`) afin d'élargir le parc installé, après vérification
 dans Xcode qu'aucune API exclusive à iOS 26 n'est utilisée.
+
+## 8. Phase 2 — décisions
+
+### 8.1 Fournisseurs d'horaires et politique de fallback
+
+`DefaultPrayerTimesRepository` applique : **cache → API → calcul local**.
+
+- Le cache passe **en premier** (écart assumé au schéma du prompt) :
+  les horaires sont déterministes (jour + lieu + méthode), une entrée
+  n'est donc jamais périmée. Zéro appel réseau redondant, batterie préservée.
+- Tout changement de configuration (méthode, Asr, règle de latitude,
+  angles, ajustements) change la clé de cache → nouvel appel API.
+- L'API est **contournée** quand des angles personnalisés sont définis
+  (format `methodSettings` non vérifiable) : le calcul local garantit
+  des résultats cohérents en ligne comme hors-ligne.
+- Seuls les succès API sont mis en cache (jamais le calcul local),
+  pour préférer l'API dès qu'elle redevient disponible.
+- Ajustements : l'API inclut déjà les offsets officiels des méthodes
+  (vérifié : Diyanet), on n'y ajoute que les manuels ; le calcul local
+  reçoit offsets de méthode + manuels (additionnés, en un seul point).
+
+### 8.2 API Aladhan — paramètres vérifiés le 2026-09-13
+
+Par appels réels (`meta.method.params`, `meta.offset`, échos `school`
+et `latitudeAdjustmentMethod`) :
+
+| Méthode | ID | Fajr | Maghrib | Isha |
+|---|---|---|---|---|
+| Muslim World League | 3 | 18° | coucher | 17° |
+| Égyptienne | 5 | 19,5° | coucher | 17,5° |
+| Karachi | 1 | 18° | coucher | 18° |
+| Umm al-Qura | 4 | 18,5° | coucher | 90 min |
+| ISNA | 2 | 15° | coucher | 15° |
+| Diyanet | 13 | 18° | coucher | 17° + offsets (−7, +5, +4, +7) |
+| Koweït | 9 | 18° | coucher | 17,5° |
+| Qatar | 10 | 18° | coucher | 90 min |
+| Singapour | 11 | 20° | coucher | 18° |
+| Téhéran | 7 | 17,7° | 4,5° | 14° |
+| Jafari | 0 | 16° | 4° | 14° |
+| UOIF (France, **ajoutée**) | 12 | 12° | coucher | 12° |
+
+`school` : 0 = standard, 1 = Hanafi. `latitudeAdjustmentMethod` :
+1 = MiddleOfNight, 2 = OneSeventh, 3 = AngleBased.
+Les tests `PrayerCalculatorTests` comparent le moteur local aux valeurs
+dorées de l'API (Évry, 13-09-2026, tolérance ±2 min).
+
+### 8.3 Moteur de calcul local
+
+`PrayerCalculator` (+ `SolarCalculator`) : algorithme astronomique
+classique (type PrayTimes), mathématiques publiques, sans dépendance.
+Toujours disponible hors-ligne. Arrondi à la minute. Robuste aux
+régions polaires (termes trigonométriques bornés, garde-fous NaN).
+
+### 8.4 Localisation et villes
+
+- Core Location **one-shot** (`requestLocation`, précision km) : aucun
+  suivi continu. Clé `NSLocationWhenInUseUsageDescription` via build
+  setting + `InfoPlist.xcstrings` (en/fr/ar).
+- Recherche de villes via **MapKit** (`MKLocalSearchCompleter` +
+  `MKLocalSearch`) : gratuit, sans clé API, mondial. Fuseau via
+  `placemark.timeZone`, secours par géocodage inverse.
+- Cascade du résolveur : GPS → dernière position connue → ville active.
+- `CityStore` détient villes + ville active (source unique du mode
+  manuel) ; réglages migrés v1→v2 sans perte (voir
+  `UserDefaultsSettingsStore.LegacySettings`).
+
+### 8.5 Persistance : SwiftData évalué et écarté
+
+Villes (≤ 20), cache (≤ 30 entrées), réglages : structures minuscules,
+accès simples, aucune relation. `UserDefaults` + JSON versionné suffit
+et reste lisible/testable. SwiftData sera réévalué si le modèle se
+complexifie (historique, mosquées favorites…).
+
+### 8.6 Concurrence : ajustement documenté
+
+Le dépôt et `GetPrayerTimesUseCase` ne sont plus `Sendable` : ils
+détiennent des magasins MainActor, et tout le flux de données est
+sérialisé sur le MainActor (isolation par défaut du projet). Les
+protocoles sans dépendance (`PrayerTimesProvider`, services futurs
+audio/notifications) restent `Sendable`. Les délégués ObjC
+(Core Location, MapKit) utilisent le motif `nonisolated` + relais
+`Task { @MainActor in }` avec extraction préalable de valeurs
+`Sendable` (pas de capture d'objets non-`Sendable`).

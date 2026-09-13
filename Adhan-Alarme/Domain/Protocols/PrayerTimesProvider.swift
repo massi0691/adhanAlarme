@@ -6,6 +6,7 @@ protocol PrayerTimesProvider: Sendable {
     func fetchPrayerTimes(
         date: Date,
         coordinates: Coordinates,
+        timeZone: TimeZone,
         configuration: PrayerCalculationConfiguration
     ) async throws -> PrayerTimes
 }
