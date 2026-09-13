@@ -53,3 +53,4 @@
 
 "error.generic" = "Ur nezmir ara ad d-nawi wakud n tzallit.";
 "error.cityResolve" = "Ur nezmir ara ad nernu tamdint-a.";
+"audio.nowPlayingTitle" = "Adhan – %@";

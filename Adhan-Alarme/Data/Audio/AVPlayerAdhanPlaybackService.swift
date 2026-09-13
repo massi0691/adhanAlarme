@@ -7,18 +7,27 @@ import Foundation
 /// débranchement casque gérés selon les recommandations Apple.
 /// Observateurs enregistrés une fois (durée de vie = celle de l'app via
 /// `AppContainer`), closures `[weak self]` : aucune fuite, rien à retirer.
-/// Continuation en arrière-plan + Now Playing : voir lot D (phase 3).
+/// Poursuite en arrière-plan : capacité `audio` (Info.plist) + Now Playing.
 @MainActor
 final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
     private let audioStore: any MuezzinAudioStore
+    private let nowPlaying: AdhanNowPlayingController
     private var player: AVPlayer?
     private var currentMuezzinID: String?
+    private var currentTitle: String?
+    private var currentDuration: TimeInterval?
     private var wasPlayingBeforeInterruption = false
 
     private(set) var state: AdhanPlaybackState = .stopped
 
-    init(audioStore: any MuezzinAudioStore) {
+    init(
+        audioStore: any MuezzinAudioStore,
+        nowPlaying: AdhanNowPlayingController = AdhanNowPlayingController()
+    ) {
         self.audioStore = audioStore
+        self.nowPlaying = nowPlaying
+        nowPlaying.onPlay = { [weak self] in self?.resume() }
+        nowPlaying.onPause = { [weak self] in self?.pause() }
         let center = NotificationCenter.default
         _ = center.addObserver(
             forName: AVAudioSession.interruptionNotification,
@@ -68,6 +77,13 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
         guard playable else {
             throw AdhanPlaybackError.fileUnreadable(muezzinID: muezzin.id)
         }
+        let duration = try? await asset.load(.duration)
+        let durationSeconds: TimeInterval? = {
+            guard let duration, duration.isNumeric, duration.seconds.isFinite, duration.seconds > 0 else {
+                return nil
+            }
+            return duration.seconds
+        }()
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, mode: .spokenAudio)
@@ -80,8 +96,12 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
         let player = AVPlayer(playerItem: item)
         self.player = player
         currentMuezzinID = muezzin.id
+        currentDuration = durationSeconds
+        let title = String(format: String(localized: "audio.nowPlayingTitle"), muezzin.name)
+        currentTitle = title
         player.play()
         state = .playing(muezzinID: muezzin.id)
+        nowPlaying.update(title: title, duration: durationSeconds, isPlaying: true)
     }
 
     func stop() {
@@ -92,12 +112,18 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
         guard case .playing(let id) = state else { return }
         player?.pause()
         state = .paused(muezzinID: id)
+        if let currentTitle {
+            nowPlaying.update(title: currentTitle, duration: currentDuration, isPlaying: false)
+        }
     }
 
     func resume() {
         guard case .paused(let id) = state else { return }
         player?.play()
         state = .playing(muezzinID: id)
+        if let currentTitle {
+            nowPlaying.update(title: currentTitle, duration: currentDuration, isPlaying: true)
+        }
     }
 
     // MARK: - Interruptions et routes
@@ -148,6 +174,9 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
         stopPlayback()
         state = .stopped
         currentMuezzinID = nil
+        currentTitle = nil
+        currentDuration = nil
+        nowPlaying.clear()
         // Libère la session poliment (les apps interrompues peuvent reprendre).
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
