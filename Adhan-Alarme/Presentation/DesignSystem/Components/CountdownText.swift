@@ -11,6 +11,9 @@ struct CountdownText: View {
             Text(CountdownFormatter.string(until: target, from: context.date))
                 .font(DSTypography.countdown)
                 .foregroundStyle(foreground)
+                // Secondes changeantes : cachées à VoiceOver (la carte hero
+                // annonce déjà le nom et l'horaire, stables).
+                .accessibilityHidden(true)
         }
     }
 }
