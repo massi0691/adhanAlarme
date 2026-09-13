@@ -417,3 +417,41 @@ audio/notifications) restent `Sendable`. Les délégués ObjC
 - « Écouter » → Adhan complet AVPlayer, chaîne annulée.
 - Désactiver → retour notification unique ; couverture ≈ 1 jour
   (rouvrir l'app quotidiennement).
+
+## 13. Multilingue complet (phase 6)
+
+### 13.1 Catalogue et chargeur
+- 104 clés × fr/en/ar (+ kabyle) ; arabe complété (39 clés manquantes).
+- `AppLanguage` (système/fr/en/ar/kab) + `LanguageSettings` (source
+  observable persistée) + `AppLocalization` (`.lproj` explicites,
+  `kab.lproj` table `Kabyle`, replis — jamais de vide).
+- UI : `Text` + environnement `locale` (re-résolu au changement) ;
+  kabyle : nécessite `kab.lproj` dans les ressources du bundle.
+
+### 13.2 Application et RTL
+- App : `.environment(\.locale)` + `.environment(\.layoutDirection)`
+  (arabe → RTL). Notifications, Now Playing, ville, ajustements :
+  résolus dans la langue de l'app (replanification au changement).
+- Audit RTL : alignements adaptatifs partout ; seul glyphe
+  directionnel (chevron accueil) basculé selon la direction ;
+  compte à rebours en chiffres latins (volontaire, universel).
+
+### 13.3 Kabyle
+- Traductions provisoires (rédigées sans locuteur natif) : à valider
+  par un kabylophone avant publication (`Kabyle.strings`, 104 clés).
+
+### 13.4 Tests
+- `AppLocalizationTests` (mapping, replis), `SettingsViewModelTests`
+  (+ 2 : persistance langue, replanification). Chargements positifs
+  et rendu RTL : recette manuelle.
+
+### 13.5 Recette manuelle
+- `⌘B` + `⌘U`.
+- Sélecteur : Système/Français/English/العربية/Taqbaylit → UI
+  entière basculée sans redémarrage ; arabe → mise en page RTL
+  (chevron accueil miroir, chiffres minuteur latins).
+- Notifications + « Écouter » + Now Playing dans la langue choisie
+  (replanification auto au changement).
+- Kabyle : vérifier `kab.lproj` copié (Target Membership), sinon
+  repli silencieux vers la langue appareil.
+- Faire valider `Kabyle.strings` par un kabylophone.

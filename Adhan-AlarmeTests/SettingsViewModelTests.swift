@@ -372,4 +372,28 @@ struct SettingsViewModelTests {
         await world.viewModel.setLongAdhanEnabled(false)
         #expect(world.viewModel.longAdhanEnabled == false)
     }
+
+    @Test func setAppLanguagePersists() {
+        guard let world = makeWorld() else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        world.viewModel.setAppLanguage(.english)
+        #expect(world.viewModel.appLanguage == .english)
+        let reloaded = UserDefaultsSettingsStore(userDefaults: world.defaults)
+        #expect(reloaded.settings.appLanguage == .english)
+    }
+
+    @Test func setAppLanguageReschedules() async {
+        guard let world = makeWorld() else {
+            #expect(Bool(false), "réglages inaccessibles")
+            return
+        }
+        world.viewModel.setAppLanguage(.arabic)
+        for _ in 0..<100 {
+            if !world.alerts.scheduled.isEmpty { break }
+            try? await Task.sleep(nanoseconds: 10_000_000)
+        }
+        #expect(!world.alerts.scheduled.isEmpty)
+    }
 }
