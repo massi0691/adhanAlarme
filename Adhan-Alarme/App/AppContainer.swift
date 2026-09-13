@@ -117,10 +117,13 @@ final class AppContainer {
     }
 
     func makeHomeViewModel() -> HomeViewModel {
-        HomeViewModel(
-            getPrayerTimes: GetPrayerTimesUseCase(repository: prayerTimesRepository),
+        let getTimes = GetPrayerTimesUseCase(repository: prayerTimesRepository)
+        return HomeViewModel(
+            getPrayerTimes: getTimes,
             settingsStore: settingsStore,
-            resolver: resolver
+            resolver: resolver,
+            alertScheduler: SchedulePrayerAlertsUseCase(prayerTimes: getTimes, resolver: resolver),
+            alertService: alertService
         )
     }
 
@@ -139,10 +142,13 @@ final class AppContainer {
     }
 
     func makeSettingsViewModel() -> SettingsViewModel {
-        SettingsViewModel(
+        let getTimes = GetPrayerTimesUseCase(repository: prayerTimesRepository)
+        return SettingsViewModel(
             settingsStore: settingsStore,
             audioStore: audioStore,
-            playback: playbackService
+            playback: playbackService,
+            alertScheduler: SchedulePrayerAlertsUseCase(prayerTimes: getTimes, resolver: resolver),
+            alertService: alertService
         )
     }
 }

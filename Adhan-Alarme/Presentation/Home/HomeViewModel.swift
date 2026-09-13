@@ -24,6 +24,8 @@ final class HomeViewModel {
     private let getNextPrayer = GetNextPrayerUseCase()
     private let settingsStore: any SettingsStoring
     private let resolver: any ActiveLocationResolving
+    private let alertScheduler: SchedulePrayerAlertsUseCase
+    private let alertService: any PrayerAlertService
     private let calendar: Calendar
 
     private(set) var state: HomeViewState = .loading
@@ -35,11 +37,15 @@ final class HomeViewModel {
         getPrayerTimes: GetPrayerTimesUseCase,
         settingsStore: any SettingsStoring,
         resolver: any ActiveLocationResolving,
+        alertScheduler: SchedulePrayerAlertsUseCase,
+        alertService: any PrayerAlertService,
         calendar: Calendar = .current
     ) {
         self.getPrayerTimes = getPrayerTimes
         self.settingsStore = settingsStore
         self.resolver = resolver
+        self.alertScheduler = alertScheduler
+        self.alertService = alertService
         self.calendar = calendar
         self.adhanEnabled = settingsStore.settings.globalAdhanEnabled
     }
@@ -77,6 +83,7 @@ final class HomeViewModel {
             cityName = location.displayName ?? String(localized: "home.location.current")
             adhanEnabled = settingsStore.settings.globalAdhanEnabled
             state = .loaded(PrayerDay(times: today, next: next))
+            await scheduleAlertsIfNeeded(for: today, now: now)
         } catch {
             state = .failed
         }
@@ -86,7 +93,38 @@ final class HomeViewModel {
     func toggleAdhan() {
         settingsStore.setGlobalAdhanEnabled(!adhanEnabled)
         adhanEnabled = settingsStore.settings.globalAdhanEnabled
+        Task { await refreshAlerts() }
     }
+
+    private var lastScheduledDayID: String?
+
+    /// Replanifie après un changement (bascule globale).
+    private func refreshAlerts() async {
+        lastScheduledDayID = nil
+        guard case .loaded(let day) = state else { return }
+        await scheduleAlertsIfNeeded(for: day.times, now: Date())
+    }
+
+    /// Planifie après un chargement réussi, une seule fois par jour.
+    /// Best-effort : l'affichage ne dépend pas des alertes.
+    private func scheduleAlertsIfNeeded(for day: PrayerTimes, now: Date) async {
+        let dayID = Self.dayIDFormatter.string(from: day.date)
+        guard dayID != lastScheduledDayID else { return }
+        do {
+            let requests = try await alertScheduler.execute(now: now, settings: settingsStore.settings)
+            try await alertService.schedule(requests)
+            lastScheduledDayID = dayID
+        } catch {
+            // Réessayé au prochain chargement.
+        }
+    }
+
+    private static let dayIDFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd"
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter
+    }()
 
     /// Recharge les horaires si le jour a changé (appelée chaque minute
     /// par la `TimelineView` de `HomeView`).

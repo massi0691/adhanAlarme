@@ -10,12 +10,15 @@ final class SettingsViewModel {
     private let settingsStore: any SettingsStoring
     private let audioStore: any MuezzinAudioStore
     private let playback: any AdhanPlaybackService
+    private let alertScheduler: SchedulePrayerAlertsUseCase
+    private let alertService: any PrayerAlertService
 
     let voices: [Muezzin] = Muezzin.catalog
     private(set) var selectedMuezzinID: String
     private(set) var availability: [String: MuezzinAudioAvailability] = [:]
     private(set) var downloadProgress: [String: Double] = [:]
     private(set) var errorKey: String?
+    private(set) var alertAuthorization: PrayerAlertAuthorization = .notDetermined
 
     /// Lecture directe du service : suivi temps réel (interruptions, fin…).
     var playbackState: AdhanPlaybackState { playback.state }
@@ -23,11 +26,15 @@ final class SettingsViewModel {
     init(
         settingsStore: any SettingsStoring,
         audioStore: any MuezzinAudioStore,
-        playback: any AdhanPlaybackService
+        playback: any AdhanPlaybackService,
+        alertScheduler: SchedulePrayerAlertsUseCase,
+        alertService: any PrayerAlertService
     ) {
         self.settingsStore = settingsStore
         self.audioStore = audioStore
         self.playback = playback
+        self.alertScheduler = alertScheduler
+        self.alertService = alertService
         self.selectedMuezzinID = settingsStore.settings.selectedMuezzinID
         refreshAvailability()
     }
@@ -48,6 +55,7 @@ final class SettingsViewModel {
         }
         settingsStore.settings = settings
         selectedMuezzinID = muezzin.id
+        Task { await refreshAlerts() }
     }
 
     func togglePlay(_ muezzin: Muezzin) async {
@@ -101,6 +109,43 @@ final class SettingsViewModel {
             errorKey = "audio.error.failed"
         }
         refreshAvailability()
+    }
+
+    // MARK: - Alertes
+
+    /// Active les alertes : demande système puis planification.
+    func enableAlerts() async {
+        let granted = (try? await alertService.requestAuthorization()) ?? false
+        alertAuthorization = await alertService.authorizationStatus()
+        guard granted else { return }
+        settingsStore.settings.alertsEnabled = true
+        await refreshAlerts()
+    }
+
+    /// Coupe les alertes (les notifications planifiées sont annulées).
+    func disableAlerts() {
+        settingsStore.settings.alertsEnabled = false
+        Task { await refreshAlerts() }
+    }
+
+    /// Mode d'une prière (Adhan / notification / silencieux).
+    func setAlertMode(_ mode: PrayerAlertMode, for prayer: Prayer) {
+        settingsStore.settings.prayerPreferences[prayer]?.alertMode = mode
+        Task { await refreshAlerts() }
+    }
+
+    /// État de l'autorisation système (lu à l'ouverture de Réglages).
+    func loadAlertAuthorization() async {
+        alertAuthorization = await alertService.authorizationStatus()
+    }
+
+    private func refreshAlerts() async {
+        do {
+            let requests = try await alertScheduler.execute(now: Date(), settings: settingsStore.settings)
+            try await alertService.schedule(requests)
+        } catch {
+            // Best-effort : les réglages restent valides sans planification.
+        }
     }
 
     private func refreshAvailability() {

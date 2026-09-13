@@ -43,17 +43,37 @@ struct SettingsViewModelTests {
         }
     }
 
+    private final class MockAlertService: PrayerAlertService {
+        var status: PrayerAlertAuthorization = .authorized
+        var scheduled: [[PrayerAlertRequest]] = []
+        func authorizationStatus() async -> PrayerAlertAuthorization { status }
+        func requestAuthorization() async throws -> Bool { status == .authorized }
+        func schedule(_ requests: [PrayerAlertRequest]) async throws { scheduled.append(requests) }
+        func cancelAll() async {}
+    }
+
     private func makeWorld(
         store: MockAudioStore = MockAudioStore(),
-        playback: MockPlayback = MockPlayback()
-    ) -> (viewModel: SettingsViewModel, defaults: UserDefaults)? {
+        playback: MockPlayback = MockPlayback(),
+        alerts: MockAlertService = MockAlertService()
+    ) -> (viewModel: SettingsViewModel, defaults: UserDefaults, alerts: MockAlertService)? {
         guard let defaults = UserDefaults(suiteName: "test.\(UUID().uuidString)") else { return nil }
+        let local = LocalCalculationProvider()
         let viewModel = SettingsViewModel(
             settingsStore: UserDefaultsSettingsStore(userDefaults: defaults),
             audioStore: store,
-            playback: playback
+            playback: playback,
+            alertScheduler: SchedulePrayerAlertsUseCase(
+                prayerTimes: GetPrayerTimesUseCase(repository: DefaultPrayerTimesRepository(
+                    api: local,
+                    local: local,
+                    cache: PrayerTimesCache(userDefaults: defaults)
+                )),
+                resolver: StaticLocationResolver()
+            ),
+            alertService: alerts
         )
-        return (viewModel, defaults)
+        return (viewModel, defaults, alerts)
     }
 
     @Test func selectPersistsMuezzinID() {
