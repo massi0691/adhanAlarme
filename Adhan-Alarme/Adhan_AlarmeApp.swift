@@ -11,6 +11,8 @@ struct Adhan_AlarmeApp: App {
                 locationViewModel: container.makeLocationViewModel(),
                 settingsViewModel: container.makeSettingsViewModel()
             )
+            .environment(\.locale, container.languageSettings.locale ?? Locale.current)
+            .environment(\.layoutDirection, container.languageSettings.appLanguage.isRightToLeft ? .rightToLeft : .leftToRight)
         }
     }
 }
