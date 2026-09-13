@@ -12,4 +12,6 @@ protocol AdhanPlaybackService {
     func playAdhan(_ muezzin: Muezzin) async throws
     func stop()
     func pause()
+    /// Reprend après `pause()` (sans repartir du début).
+    func resume()
 }
