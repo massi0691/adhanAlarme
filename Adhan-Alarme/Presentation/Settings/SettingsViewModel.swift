@@ -15,7 +15,7 @@ final class SettingsViewModel {
     private let alertService: any PrayerAlertService
     private let segments: any AdhanSegmentStore
     private let language: LanguageSettings
-    private let appearance: AppearanceSettings
+    private let appearanceSettings: AppearanceSettings
 
     let voices: [Muezzin] = Muezzin.catalog
     private(set) var selectedMuezzinID: String
@@ -58,7 +58,7 @@ final class SettingsViewModel {
         self.alertService = alertService
         self.segments = segments
         self.language = language
-        self.appearance = appearance
+        self.appearanceSettings = appearance
         self.selectedMuezzinID = settingsStore.settings.selectedMuezzinID
         refreshAvailability()
         syncAlertState()
@@ -236,12 +236,12 @@ final class SettingsViewModel {
 
     /// Apparence de l'interface (appliquée aussitôt à la racine).
     func setAppearance(_ appearance: AppAppearance) {
-        self.appearance.setAppearance(appearance)
+        self.appearanceSettings.setAppearance(appearance)
         syncAppearanceState()
     }
 
     private func syncAppearanceState() {
-        appearance = self.appearance.appearance
+        appearance = appearanceSettings.appearance
     }
 
     // MARK: - Calcul
