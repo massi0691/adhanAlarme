@@ -47,9 +47,9 @@ struct SettingsViewModelTests {
         var status: PrayerAlertAuthorization = .authorized
         var scheduled: [[PrayerAlertRequest]] = []
         func authorizationStatus() async -> PrayerAlertAuthorization { status }
-        func requestAuthorization() async throws -> Bool { status == .authorized }
+        func requestAuthorization() async -> PrayerAlertAuthorization { status }
         func schedule(_ requests: [PrayerAlertRequest]) async throws { scheduled.append(requests) }
-        func cancelAll() async {}
+        func cancelAllAlerts() async {}
     }
 
     private func makeWorld(

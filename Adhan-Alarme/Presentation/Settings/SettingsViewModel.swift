@@ -120,9 +120,8 @@ final class SettingsViewModel {
 
     /// Active les alertes : demande système puis planification.
     func enableAlerts() async {
-        let granted = (try? await alertService.requestAuthorization()) ?? false
-        alertAuthorization = await alertService.authorizationStatus()
-        guard granted else { return }
+        alertAuthorization = await alertService.requestAuthorization()
+        guard alertAuthorization.canSchedule else { return }
         settingsStore.settings.globalAdhanEnabled = true
         alertsEnabled = true
         await refreshAlerts()
