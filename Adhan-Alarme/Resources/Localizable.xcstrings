@@ -146,6 +146,12 @@
             "state": "translated",
             "value": "Hanafi (shadow ×2)"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حنفي (الظل ×2)"
+          }
         }
       }
     },
@@ -161,6 +167,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Standard (shadow ×1)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قياسي (الظل ×1)"
           }
         }
       }
@@ -443,6 +455,12 @@
             "state": "translated",
             "value": "Angle-based"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حسب الزاوية"
+          }
         }
       }
     },
@@ -459,6 +477,12 @@
             "state": "translated",
             "value": "Middle of the night"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منتصف الليل"
+          }
         }
       }
     },
@@ -474,6 +498,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "One seventh of the night"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سُبع الليل"
           }
         }
       }
@@ -931,6 +961,12 @@
             "state": "translated",
             "value": "Diyanet (Türkiye)"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ديانة (تركيا)"
+          }
         }
       }
     },
@@ -946,6 +982,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Egyptian General Authority"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الهيئة المصرية"
           }
         }
       }
@@ -963,6 +1005,12 @@
             "state": "translated",
             "value": "ISNA (North America)"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إسنا (أمريكا الشمالية)"
+          }
         }
       }
     },
@@ -978,6 +1026,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Jafari (Shia)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جعفري (شيعي)"
           }
         }
       }
@@ -995,6 +1049,12 @@
             "state": "translated",
             "value": "Karachi (Pakistan)"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كراتشي (باكستان)"
+          }
         }
       }
     },
@@ -1010,6 +1070,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kuwait"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الكويت"
           }
         }
       }
@@ -1027,6 +1093,12 @@
             "state": "translated",
             "value": "Muslim World League"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رابطة العالم الإسلامي"
+          }
         }
       }
     },
@@ -1042,6 +1114,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Qatar"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قطر"
           }
         }
       }
@@ -1059,6 +1137,12 @@
             "state": "translated",
             "value": "Singapore"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سنغافورة"
+          }
         }
       }
     },
@@ -1074,6 +1158,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tehran"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طهران"
           }
         }
       }
@@ -1091,6 +1181,12 @@
             "state": "translated",
             "value": "Umm al-Qura (Makkah)"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أم القرى (مكة المكرمة)"
+          }
         }
       }
     },
@@ -1106,6 +1202,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "UOIF (France)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UOIF (فرنسا)"
           }
         }
       }
@@ -1255,6 +1357,12 @@
             "state": "translated",
             "value": "Notifications are off — enable them in Settings to receive the Adhan."
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الإشعارات معطّلة — فعّلها في الإعدادات لاستقبال الأذان."
+          }
         }
       }
     },
@@ -1270,6 +1378,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Alerts"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التنبيهات"
           }
         }
       }
@@ -1287,6 +1401,12 @@
             "state": "translated",
             "value": "Long Adhan (experimental)"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أذان طويل (تجريبي)"
+          }
         }
       }
     },
@@ -1302,6 +1422,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Chains 30-second excerpts (≈ 8 banners per prayer, ≈ 1 day of coverage). The voice must be downloaded."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يسلسل مقاطع من 30 ثانية (≈ 8 لافتات لكل صلاة، تغطية ≈ يوم واحد). يجب تنزيل الصوت أولاً."
           }
         }
       }
@@ -1319,6 +1445,12 @@
             "state": "translated",
             "value": "Download the voice first to enable Long Adhan."
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نزّل الصوت أولاً لتفعيل الأذان الطويل."
+          }
         }
       }
     },
@@ -1334,6 +1466,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Adhan"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أذان"
           }
         }
       }
@@ -1351,6 +1489,12 @@
             "state": "translated",
             "value": "Notification"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إشعار"
+          }
         }
       }
     },
@@ -1366,6 +1510,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Silent"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صامت"
           }
         }
       }
@@ -1383,6 +1533,12 @@
             "state": "translated",
             "value": "Open Settings"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فتح الإعدادات"
+          }
         }
       }
     },
@@ -1398,6 +1554,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Preparing excerpts…"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جارٍ تحضير المقاطع…"
           }
         }
       }
@@ -1415,6 +1577,12 @@
             "state": "translated",
             "value": "Prayer alerts"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تنبيهات الصلاة"
+          }
         }
       }
     },
@@ -1430,6 +1598,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Adjustments"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعديلات"
           }
         }
       }
@@ -1447,6 +1621,12 @@
             "state": "translated",
             "value": "Minutes added to calculated times, per prayer."
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دقائق تُضاف إلى الأوقات المحسوبة، لكل صلاة."
+          }
         }
       }
     },
@@ -1462,6 +1642,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Asr calculation"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حساب العصر"
           }
         }
       }
@@ -1479,6 +1665,12 @@
             "state": "translated",
             "value": "Custom angles"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "زوايا مخصصة"
+          }
         }
       }
     },
@@ -1494,6 +1686,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Use method angles"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "استخدام زوايا الطريقة"
           }
         }
       }
@@ -1511,6 +1709,12 @@
             "state": "translated",
             "value": "Fajr angle"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "زاوية الفجر"
+          }
         }
       }
     },
@@ -1526,6 +1730,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "High latitudes"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطوط العرض العالية"
           }
         }
       }
@@ -1543,6 +1753,12 @@
             "state": "translated",
             "value": "Isha angle"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "زاوية العشاء"
+          }
         }
       }
     },
@@ -1558,6 +1774,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Method"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الطريقة"
           }
         }
       }
@@ -1575,6 +1797,12 @@
             "state": "translated",
             "value": "%+d min"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%+d د"
+          }
         }
       }
     },
@@ -1590,6 +1818,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Time calculation"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حساب الأوقات"
           }
         }
       }
