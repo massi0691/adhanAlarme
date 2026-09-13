@@ -7,6 +7,7 @@ struct HomeView: View {
     private let locationViewModel: LocationViewModel
     private let settingsViewModel: SettingsViewModel
     @State private var showingSettings = false
+    @Environment(\.layoutDirection) private var layoutDirection
 
     init(viewModel: HomeViewModel, locationViewModel: LocationViewModel, settingsViewModel: SettingsViewModel) {
         _viewModel = State(wrappedValue: viewModel)
@@ -79,7 +80,7 @@ struct HomeView: View {
                         } icon: {
                             Image(systemName: "mappin.circle.fill")
                         }
-                        Image(systemName: "chevron.right")
+                        Image(systemName: layoutDirection == .rightToLeft ? "chevron.left" : "chevron.right")
                             .font(.caption)
                             .fontWeight(.semibold)
                     }
