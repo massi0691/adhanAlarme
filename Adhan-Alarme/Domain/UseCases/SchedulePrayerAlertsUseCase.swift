@@ -55,6 +55,7 @@ struct SchedulePrayerAlertsUseCase {
                 requests.append(PrayerAlertRequest(
                     prayer: prayer,
                     fireDate: fireDate,
+                    timeZone: location.timeZone,
                     mode: preference.mode,
                     muezzinID: preference.selectedMuezzinID
                 ))

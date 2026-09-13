@@ -6,6 +6,8 @@ import Foundation
 struct PrayerAlertRequest: Sendable, Hashable {
     let prayer: Prayer
     let fireDate: Date
+    /// Fuseau du lieu (déclencheur calendaire exact).
+    let timeZone: TimeZone
     let mode: PrayerAlertMode
     let muezzinID: String
 
