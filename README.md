@@ -25,7 +25,8 @@ Limitations iOS (Adhan auto, 30 s, 64 notifications) :
 - [x] **Phase 3** — Moteur AVPlayer (interruptions, Bluetooth, arrière-plan),
   téléchargement + cache, écran Réglages (voix)
 - [ ] **Phase 3 (Xcode)** — `⌘B` + `⌘U` + recette manuelle (§9.6)
-- [ ] **Phase 4** — Notifications, rolling schedule, réglages d'alerte
+- [x] **Phase 4** — Notifications, rolling schedule, réglages d'alerte
+- [ ] **Phase 4 (Xcode)** — `⌘B` + `⌘U` + recette manuelle (§10.8)
 - [ ] **Phase 5** — Méthodes de calcul, Asr, hautes latitudes, ajustements
 - [ ] **Phase 6** — Multilingue complet, sélecteur in-app, RTL, kabyle validé
 - [ ] **Phase 7** — Tests UI, accessibilité, optimisation, publication
@@ -36,3 +37,10 @@ Moteur AVPlayer + téléchargement + écran Réglages (voix).
 Les fichiers Adhan ne sont pas fournis (droits d'auteur) : bundle,
 `remoteURL` ou MP3 de test — voir
 `Adhan-Alarme/Resources/Adhan/README.md`.
+
+## Alertes (phase 4)
+
+Planification locale glissante (7 jours, 42 notifications max),
+modes par prière (Adhan / notification / silencieux), lecture auto
+quand l'app est ouverte, action « Écouter », son custom < 30 s
+optionnel (`adhan-short.caf`). Détails : §10 d'ARCHITECTURE.

@@ -255,3 +255,85 @@ audio/notifications) restent `Sendable`. Les délégués ObjC
 - Bluetooth (enceinte/AirPods) : routage auto ; déconnexion → pause.
 - Casque débranché → pause, pas de haut-parleur surprise.
 - Voix non disponible → message clair (jamais de crash).
+
+## 10. Alertes locales (phase 4)
+
+### 10.1 Chaîne de planification
+- `SchedulePrayerAlertsUseCase` (non isolé, testé) : fenêtre glissante
+  7 jours (aujourd'hui + 6), passé ignoré, prières silencieuses ou
+  désactivées ignorées. Interrupteur global coupé → `[]` (= annulation).
+- Identifiants stables `adhan.<prière>.<AAAAMMJJ>` (jour UTC) :
+  replanifier remplace au lieu de dupliquer.
+- 7 × 6 = 42 < 64 (limite iOS), garde `prefix(64)` par prudence.
+- `PrayerAlertRequestMapper` (pur) : déclencheur calendaire exact
+  (année→seconde, fuseau du lieu), non répété (nettoyé après le tir).
+
+### 10.2 Contenu et son
+- `PrayerAlertContentFactory` (pure) : chaînes pré-rendues via `localize`
+  (locale de l'interface au moment planifié). Mode `.adhan` :
+  catégorie `ADHAN_ALERT` + `timeSensitive` ; `.notificationOnly` :
+  `.active` + son système ; `.silent` filtré en amont.
+- Son custom : extrait < 30 s (`adhan-short.caf`, bundle ou
+  `Library/Sounds`, résolu par `LocalPrayerAlertService`), sinon son
+  système. Un fichier complet (> 30 s) est refusé par iOS.
+- `LocalPrayerAlertService` (`@MainActor`) : autorisation (dont
+  provisoire/éphémère), annule-puis-planifie, catégories au init.
+  Non `Sendable` (détient `UNUserNotificationCenter`), comme l'audio.
+
+### 10.3 Réponses (délégué)
+- `PrayerAlertActionHandler` (`UNUserNotificationCenterDelegate`,
+  assigné en production uniquement) : app ouverte + mode Adhan →
+  lecture complète AVPlayer, bannière supprimée (l'Adhan EST l'alerte),
+  repli bannière + son si échec ; action « Écouter » → lecture de la
+  voix de la prière (`muezzinID` du `userInfo`, défaut sinon) ; tap du
+  corps → ouvre l'app, sans lecture.
+- Swift 6 : valeurs `userInfo` (`String`) extraites AVANT le saut
+  `MainActor`, completion handlers système transportés via
+  `CompletionBox` (`@unchecked Sendable`, contrat Apple : appelables
+  depuis n'importe quel thread, exactement une fois).
+
+### 10.4 Déclencheurs
+- Accueil : après chaque chargement réussi, une fois par jour
+  (`lastScheduledDayID`) ; bascule globale → replanifie aussitôt ;
+  changement de fuseau système → recharge (+ replanifie).
+- Réglages : activation (demande système puis planifie), coupure,
+  mode par prière, sélection de voix (propagée aux 6 prières en v1,
+  embarquée dans le `userInfo`) → replanifient.
+- Permission refusée → planification best-effort ignorée, l'UI guide
+  vers les Réglages système (lien direct).
+
+### 10.5 Arrière-plan : `BGAppRefresh` écarté (v1)
+- La fenêtre de 7 jours couvre une semaine sans ouvrir l'app ; chaque
+  lancement/avant-plan recharge et replanifie.
+- `BGAppRefresh` n'est pas garanti par iOS (opportuniste, étranglé
+  selon l'usage) et exigerait capacité + `BGTaskScheduler` + plist
+  pour un gain marginal : écarté en v1, réévaluable en phase 7.
+
+### 10.6 Interface Réglages
+- Section alertes : interrupteur global (demande système à
+  l'activation), avertissement + lien Réglages système si refusé,
+  mode par prière (`Adhan` / `Notification` / `Silencieux`).
+- Interrupteur unique partagé avec l'accueil (`globalAdhanEnabled`,
+  resynchronisé à la fermeture de la feuille).
+
+### 10.7 Tests
+- `SchedulePrayerAlertsUseCaseTests` (horloge UTC figée, dépôt fixe :
+  fenêtre, passé, silences, erreurs, interrupteur),
+  `PrayerAlertRequestMapperTests` (identifiants, déclencheur, fuseau),
+  `PrayerAlertContentFactoryTests` (catégorie, niveau, son, `userInfo`),
+  `SettingsViewModelTests` (+ 4 tests : octroi/refus/coupure/mode).
+- Non testés : délégué et service système (pas d'init public
+  `UNNotification`, autorisation = invite système) → recette manuelle.
+
+### 10.8 Recette manuelle
+- `⌘B` + `⌘U` (nouveaux tests verts).
+- Fraîche install → Réglages → activer Alertes → invite système ;
+  accepter → 42 notifications planifiées (vérifiable via
+  `getPendingNotificationRequests` en `lldb`).
+- App ouverte à l'échéance → Adhan auto, pas de bannière.
+- Verrouillé à l'échéance → bannière + son ; « Écouter » → Adhan
+  complet ; tap corps → ouvre l'app sans lecture.
+- Mode `Notification` → bannière + son court, pas d'Adhan ;
+  `Silencieux` → rien. Bascule accueil OFF → plus rien.
+- Permission refusée → message + lien Réglages système.
+- Astuce : avancer l'horloge système déclenche les notifications dues.
