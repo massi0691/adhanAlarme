@@ -32,7 +32,10 @@ struct HomeView: View {
                 SettingsView(viewModel: settingsViewModel)
             }
             .onChange(of: showingSettings) { _, shown in
-                if !shown { viewModel.syncAdhanFlag() }
+                if !shown {
+                    viewModel.syncAdhanFlag()
+                    Task { await viewModel.load() }
+                }
             }
         }
     }
