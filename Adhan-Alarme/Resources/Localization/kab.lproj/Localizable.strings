@@ -1,0 +1,36 @@
+/*
+  Kabyle (kab) — TRADUCTIONS PROVISOIRES.
+  À valider par un locuteur natif avant la phase 6.
+  Le kabyle n'est pas une langue système iOS : le sélecteur in-app et le
+  chargeur dédié seront implémentés en phase 6 (voir docs/ARCHITECTURE.md).
+*/
+
+"app.name" = "Adhan Alarme";
+
+"home.greeting.morning" = "Tufat igerrzen";
+"home.greeting.afternoon" = "Azul";
+"home.greeting.evening" = "Tameddit igerrzen";
+
+"home.nextPrayer" = "Tazallit i d-iteddun";
+"home.in" = "Deg";
+"home.tomorrow" = "Azekka";
+
+"prayer.fajr" = "Lfajer";
+"prayer.sunrise" = "Ccuruq";
+"prayer.dhuhr" = "Ḍḍuher";
+"prayer.asr" = "Lɛaser";
+"prayer.maghrib" = "Lmeɣreb";
+"prayer.isha" = "Lɛica";
+
+"adhan.enabled" = "Adhan yermed";
+"adhan.disabled" = "Adhan yensa";
+"adhan.toggle.hint" = "Sit snat n tikkal i wakken ad ternuḍ neɣ ad tekksed ṣṣut n ladhan";
+
+"settings.title" = "Iɣewwaren";
+"settings.soon" = "Iɣewwaren ad d-asen deg uḥric i d-iteddun.";
+
+"common.close" = "Mdel";
+"common.retry" = "Ɛreḍ tikkelt-nniḍen";
+"common.loading" = "La itheggi…";
+
+"error.generic" = "Ur nezmir ara ad d-nawi wakud n tzallit.";
