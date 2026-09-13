@@ -94,6 +94,7 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
         }
         let destination = cacheDirectory.appendingPathComponent("custom-adhan.\(ext)")
         try fileManager.copyItem(at: sourceURL, to: destination)
+        Self.relaxProtection(destination)
         guard await Self.isPlayable(url: destination) else {
             try? fileManager.removeItem(at: destination)
             throw AdhanPlaybackError.downloadFailed(muezzinID: Muezzin.customID)
@@ -104,7 +105,9 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
     private func customURL() -> URL? {
         let files = (try? fileManager.contentsOfDirectory(atPath: cacheDirectory.path(percentEncoded: false))) ?? []
         guard let name = files.first(where: { $0.hasPrefix("custom-adhan.") }) else { return nil }
-        return cacheDirectory.appendingPathComponent(name)
+        let url = cacheDirectory.appendingPathComponent(name)
+        Self.ensureMediaProtection(url)
+        return url
     }
 
     /// Crée le dossier + exclusion sauvegarde (partagé import/téléchargement).
@@ -113,7 +116,27 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
         var excluded = directory
         var backupValues = URLResourceValues()
         backupValues.isExcludedFromBackup = true
+        // Lisible après le premier déverrouillage : la lecture survit
+        // à l'extinction de l'écran (cause connue de coupure audio).
+        backupValues.fileProtection = .completeUntilFirstUserAuthentication
         try? excluded.setResourceValues(backupValues)
+    }
+
+    /// Protection « lisible après 1er déverrouillage » sur un fichier.
+    nonisolated static func relaxProtection(_ url: URL) {
+        var target = url
+        var values = URLResourceValues()
+        values.fileProtection = .completeUntilFirstUserAuthentication
+        try? target.setResourceValues(values)
+    }
+
+    /// Aligne un fichier existant sur la protection média (migration
+    /// paresseuse : les voix déjà téléchargées sont corrigées au fil
+    /// des lectures, sans re-téléchargement).
+    nonisolated static func ensureMediaProtection(_ url: URL) {
+        let current = (try? url.resourceValues(forKeys: [.fileProtectionKey]))?.fileProtection
+        guard current != .completeUntilFirstUserAuthentication, current != .none else { return }
+        relaxProtection(url)
     }
 
     /// Sonde de lisibilité partagée (import + validation).
@@ -135,7 +158,9 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
 
     private func cachedURLIfExists(for muezzin: Muezzin) -> URL? {
         let url = cachedURL(for: muezzin)
-        return fileManager.fileExists(atPath: url.path(percentEncoded: false)) ? url : nil
+        guard fileManager.fileExists(atPath: url.path(percentEncoded: false)) else { return nil }
+        Self.ensureMediaProtection(url)
+        return url
     }
 
     // MARK: - Téléchargement (URLSessionDownloadTask + délégué)
@@ -195,6 +220,7 @@ private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unc
                 try manager.removeItem(at: destination)
             }
             try manager.moveItem(at: location, to: destination)
+            FileSystemMuezzinAudioStore.relaxProtection(destination)
             continuation.yield(1.0)
             continuation.finish()
         } catch {

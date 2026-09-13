@@ -50,20 +50,23 @@ final class PrayerAlertActionHandler: NSObject, UNUserNotificationCenterDelegate
         let fireInterval = info[PrayerAlertUserInfo.fireDate] as? Double
         let completion = CompletionBox(completionHandler)
         Task { @MainActor in
-            // App ouverte : les segments chaînés sont annulés (la lecture
-            // AVPlayer prend le relais, ou la bannière suffit).
-            await self.cancelRemainingSegments(prayer: prayer, fireInterval: fireInterval)
-            // App ouverte + mode Adhan : lecture complète, pas de bannière.
-            // Sinon (ou échec) : bannière + son.
-            if mode == PrayerAlertMode.adhan.rawValue,
-               let muezzin = muezzinID.flatMap(Muezzin.withID) ?? Muezzin.withID(Muezzin.defaultID) {
+            let playsAdhan = mode == PrayerAlertMode.adhan.rawValue
+            let muezzin = muezzinID.flatMap(Muezzin.withID) ?? Muezzin.withID(Muezzin.defaultID)
+            if playsAdhan, let muezzin {
+                // App ouverte : lecture complète, pas de bannière. Les segments
+                // ne sont annulés qu'APRÈS un démarrage réussi (sinon la
+                // chaîne de secours continue et l'Adhan reste audible).
                 do {
                     try await self.playback.playAdhan(muezzin)
+                    await self.cancelRemainingSegments(prayer: prayer, fireInterval: fireInterval)
                     completion.call([])
                     return
                 } catch {
-                    // Repli bannière ci-dessous.
+                    // Repli bannière ci-dessous (chaîne intacte).
                 }
+            } else if !playsAdhan {
+                // Notification simple : rien à chaîner (annulation de sûreté).
+                await self.cancelRemainingSegments(prayer: prayer, fireInterval: fireInterval)
             }
             completion.call([.banner, .sound])
         }

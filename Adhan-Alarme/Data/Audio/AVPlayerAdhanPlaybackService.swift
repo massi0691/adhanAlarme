@@ -21,6 +21,7 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
     private var currentTitle: String?
     private var currentDuration: TimeInterval?
     private var wasPlayingBeforeInterruption = false
+    private var stallRetries = 0
 
     private(set) var state: AdhanPlaybackState = .stopped
 
@@ -75,6 +76,15 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
             let itemID = (notification.object as? AVPlayerItem).map(ObjectIdentifier.init)
             Task { @MainActor in self.handlePlaybackFailure(itemID: itemID) }
         }
+        _ = center.addObserver(
+            forName: AVPlayerItem.playbackStalledNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self else { return }
+            let itemID = (notification.object as? AVPlayerItem).map(ObjectIdentifier.init)
+            Task { @MainActor in self.handlePlaybackStall(itemID: itemID) }
+        }
     }
 
     func playAdhan(_ muezzin: Muezzin) async throws {
@@ -106,6 +116,7 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
             throw AdhanPlaybackError.audioSessionFailed
         }
         stopPlayback()
+        stallRetries = 0
         let item = AVPlayerItem(asset: asset)
         let player = AVPlayer(playerItem: item)
         self.player = player
@@ -184,6 +195,18 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
     private func handlePlaybackFailure(itemID: ObjectIdentifier?) {
         guard let itemID, let current = player?.currentItem, ObjectIdentifier(current) == itemID else { return }
         finishNaturally()
+    }
+
+    /// Micro-coupure de lecture (ex. à l'extinction d'écran) : relance
+    /// best-effort, 2 essais maximum puis arrêt propre (pas de boucle).
+    private func handlePlaybackStall(itemID: ObjectIdentifier?) {
+        guard let itemID, let current = player?.currentItem, ObjectIdentifier(current) == itemID else { return }
+        if stallRetries < 2, case .playing = state {
+            stallRetries += 1
+            player?.play()
+        } else {
+            finishNaturally()
+        }
     }
 
     private func finishNaturally() {
