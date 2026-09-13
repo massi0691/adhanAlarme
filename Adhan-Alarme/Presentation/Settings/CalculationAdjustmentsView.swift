@@ -38,7 +38,8 @@ struct CalculationAdjustmentsView: View {
     }
 
     private func formattedMinutes(_ minutes: Int) -> String {
-        String(format: String(localized: "settings.calculation.minutesFormat"), minutes)
+        let format = AppLocalization.string(forKey: "settings.calculation.minutesFormat", language: viewModel.appLanguage)
+        return String(format: format, minutes)
     }
 }
 

@@ -69,7 +69,7 @@ final class AppContainer {
         )
         let audioStore = FileSystemMuezzinAudioStore()
         let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore)
-        let alerts = LocalPrayerAlertService()
+        let alerts = LocalPrayerAlertService(language: languageSettings)
         let alertHandler = PrayerAlertActionHandler(playback: playback, alerts: alerts)
         let languageSettings = LanguageSettings(settingsStore: settings)
         let container = AppContainer(
@@ -105,7 +105,7 @@ final class AppContainer {
         )
         let audioStore = FileSystemMuezzinAudioStore()
         let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore)
-        let alerts = LocalPrayerAlertService()
+        let alerts = LocalPrayerAlertService(language: languageSettings)
         let alertHandler = PrayerAlertActionHandler(playback: playback, alerts: alerts)
         let languageSettings = LanguageSettings(settingsStore: settings)
         return AppContainer(
@@ -131,7 +131,8 @@ final class AppContainer {
             settingsStore: settingsStore,
             resolver: resolver,
             alertScheduler: SchedulePrayerAlertsUseCase(prayerTimes: getTimes, resolver: resolver, segments: FileSystemAdhanSegmentStore()),
-            alertService: alertService
+            alertService: alertService,
+            language: languageSettings
         )
     }
 

@@ -26,6 +26,7 @@ final class HomeViewModel {
     private let resolver: any ActiveLocationResolving
     private let alertScheduler: SchedulePrayerAlertsUseCase
     private let alertService: any PrayerAlertService
+    private let language: LanguageSettings
     private let calendar: Calendar
 
     private(set) var state: HomeViewState = .loading
@@ -39,6 +40,7 @@ final class HomeViewModel {
         resolver: any ActiveLocationResolving,
         alertScheduler: SchedulePrayerAlertsUseCase,
         alertService: any PrayerAlertService,
+        language: LanguageSettings,
         calendar: Calendar = .current
     ) {
         self.getPrayerTimes = getPrayerTimes
@@ -46,6 +48,7 @@ final class HomeViewModel {
         self.resolver = resolver
         self.alertScheduler = alertScheduler
         self.alertService = alertService
+        self.language = language
         self.calendar = calendar
         self.adhanEnabled = settingsStore.settings.globalAdhanEnabled
     }
@@ -80,7 +83,7 @@ final class HomeViewModel {
                 tomorrowFajr = times.fajr
             }
             let next = getNextPrayer.resolve(now: now, today: today, tomorrowFajr: tomorrowFajr)
-            cityName = location.displayName ?? String(localized: "home.location.current")
+            cityName = location.displayName ?? AppLocalization.string(forKey: "home.location.current", language: language.appLanguage)
             adhanEnabled = settingsStore.settings.globalAdhanEnabled
             state = .loaded(PrayerDay(times: today, next: next))
             await scheduleAlertsIfNeeded(for: today, now: now)

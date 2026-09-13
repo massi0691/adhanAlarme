@@ -15,15 +15,16 @@ extension PrayerAlertAuthorization {
 }
 
 /// Alertes système via `UNUserNotificationCenter` (local uniquement).
-/// Catégorie « Écouter » enregistrée à l'init (locale appareil au
-/// lancement ; aucun sélecteur in-app avant la phase 6).
+/// Chaînes et catégorie « Écouter » dans la langue de l'app
+/// (re-résolues à chaque planification).
 @MainActor
 final class LocalPrayerAlertService: PrayerAlertService {
     private let center: UNUserNotificationCenter
+    private let language: LanguageSettings
 
-    init(center: UNUserNotificationCenter = .current()) {
+    init(center: UNUserNotificationCenter = .current(), language: LanguageSettings) {
         self.center = center
-        registerCategories()
+        self.language = language
     }
 
     func authorizationStatus() async -> PrayerAlertAuthorization {
@@ -43,14 +44,16 @@ final class LocalPrayerAlertService: PrayerAlertService {
         guard await authorizationStatus().canSchedule else {
             throw PrayerAlertError.permissionDenied
         }
+        let appLanguage = language.appLanguage
+        registerCategories(language: appLanguage)
         await cancelAllAlerts()
-        // Garde-fou limite iOS (le use case produit ≤ 42).
+        // Garde-fou limite iOS (le use case produit ≤ 42 — hors Adhan long).
         let capped = Array(requests.prefix(64))
         let soundName = customSoundName()
         for request in capped {
             let content = PrayerAlertContentFactory.content(
                 for: request,
-                localize: { Bundle.main.localizedString(forKey: $0, value: nil, table: nil) },
+                localize: { AppLocalization.string(forKey: $0, language: appLanguage) },
                 customSoundName: soundName
             )
             let unRequest = PrayerAlertRequestMapper.unRequest(for: request, content: content)
@@ -74,8 +77,8 @@ final class LocalPrayerAlertService: PrayerAlertService {
 
     // MARK: - Privé
 
-    private func registerCategories() {
-        let title = Bundle.main.localizedString(forKey: "alert.action.listen", value: nil, table: nil)
+    private func registerCategories(language: AppLanguage) {
+        let title = AppLocalization.string(forKey: "alert.action.listen", language: language)
         let listen = UNNotificationAction(
             identifier: PrayerAlertCategories.listenAction,
             title: title,
