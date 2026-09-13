@@ -96,6 +96,10 @@ struct HomeView: View {
             } label: {
                 Image(systemName: "gearshape")
                     .font(.title2)
+                    .foregroundStyle(DSColors.brand)
+                    .padding(DSSpacing.sm)
+                    .background(DSColors.brand.opacity(0.12))
+                    .clipShape(Circle())
             }
             .accessibilityLabel(Text("settings.title"))
         }
