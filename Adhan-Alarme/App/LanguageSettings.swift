@@ -9,13 +9,20 @@ import Observation
 final class LanguageSettings {
     private let settingsStore: any SettingsStoring
 
-    var appLanguage: AppLanguage {
-        didSet { settingsStore.settings.appLanguage = appLanguage }
-    }
+    /// Langue choisie (mutation via `setAppLanguage`, qui persiste).
+    private(set) var appLanguage: AppLanguage
 
     init(settingsStore: any SettingsStoring) {
         self.settingsStore = settingsStore
         self.appLanguage = settingsStore.settings.appLanguage
+    }
+
+    /// Change la langue et persiste le choix.
+    func setAppLanguage(_ language: AppLanguage) {
+        appLanguage = language
+        var settings = settingsStore.settings
+        settings.appLanguage = language
+        try? settingsStore.save(settings)
     }
 
     /// Locale SwiftUI (`nil` = suivre l'appareil).

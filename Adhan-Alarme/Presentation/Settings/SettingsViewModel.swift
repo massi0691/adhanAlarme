@@ -217,7 +217,7 @@ final class SettingsViewModel {
     /// Langue de l'interface (replanifie les alertes : les chaînes des
     /// notifications sont pré-rendues dans la langue de l'app).
     func setAppLanguage(_ language: AppLanguage) {
-        self.language.appLanguage = language
+        self.language.setAppLanguage(language)
         syncLanguageState()
         Task { await refreshAlerts() }
     }
