@@ -108,9 +108,9 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
     }
 
     /// Crée le dossier + exclusion sauvegarde (partagé import/téléchargement).
-    static func prepareDirectory(_ directory: URL) throws {
+    nonisolated static func prepareDirectory(_ directory: URL) throws {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let excluded = directory
+        var excluded = directory
         var backupValues = URLResourceValues()
         backupValues.isExcludedFromBackup = true
         try? excluded.setResourceValues(backupValues)
@@ -158,11 +158,13 @@ final class FileSystemMuezzinAudioStore: MuezzinAudioStore {
 /// cycle en fin de transfert (succès, échec ou annulation). Seul état
 /// partagé : la continuation (thread-safe par contrat Apple).
 private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
-    private let destination: URL
-    private let muezzinID: String
-    private let continuation: AsyncThrowingStream<Double, Error>.Continuation
+    // Écrits dans `init`, jamais mutés ensuite : partage sûr avec les
+    // callbacks non isolés (même contrat que `CompletionBox`).
+    private nonisolated(unsafe) let destination: URL
+    private nonisolated(unsafe) let muezzinID: String
+    private nonisolated(unsafe) let continuation: AsyncThrowingStream<Double, Error>.Continuation
 
-    init(destination: URL, muezzinID: String, continuation: AsyncThrowingStream<Double, Error>.Continuation) {
+    nonisolated init(destination: URL, muezzinID: String, continuation: AsyncThrowingStream<Double, Error>.Continuation) {
         self.destination = destination
         self.muezzinID = muezzinID
         self.continuation = continuation
@@ -213,13 +215,14 @@ private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unc
 
 /// Annulation `Sendable` d'une tâche (`URLSessionTask` ne l'est pas).
 private final class DownloadCanceller: @unchecked Sendable {
-    private let task: URLSessionTask
+    // Écrit dans `init`, jamais muté ensuite : partage sûr.
+    private nonisolated(unsafe) let task: URLSessionTask
 
-    init(task: URLSessionTask) {
+    nonisolated init(task: URLSessionTask) {
         self.task = task
     }
 
-    func cancel() {
+    nonisolated func cancel() {
         task.cancel()
     }
 }
