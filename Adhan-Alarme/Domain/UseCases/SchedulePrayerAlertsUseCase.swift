@@ -51,7 +51,7 @@ struct SchedulePrayerAlertsUseCase {
                 times = try await prayerTimes.execute(
                     for: day,
                     coordinates: location.coordinates,
-                    timeZone: timeZone,
+                    timeZone: location.timeZone,
                     configuration: settings.calculation
                 )
             } catch {
