@@ -5,11 +5,13 @@ import SwiftUI
 struct HomeView: View {
     @State private var viewModel: HomeViewModel
     private let locationViewModel: LocationViewModel
+    private let settingsViewModel: SettingsViewModel
     @State private var showingSettings = false
 
-    init(viewModel: HomeViewModel, locationViewModel: LocationViewModel) {
+    init(viewModel: HomeViewModel, locationViewModel: LocationViewModel, settingsViewModel: SettingsViewModel) {
         _viewModel = State(wrappedValue: viewModel)
         self.locationViewModel = locationViewModel
+        self.settingsViewModel = settingsViewModel
     }
 
     var body: some View {
@@ -24,7 +26,7 @@ struct HomeView: View {
                 await viewModel.load()
             }
             .sheet(isPresented: $showingSettings) {
-                SettingsPlaceholderView()
+                SettingsView(viewModel: settingsViewModel)
             }
         }
     }
@@ -136,30 +138,10 @@ struct HomeView: View {
     }
 }
 
-/// Feuille temporaire en attendant l'écran Réglages (phase 4/5).
-private struct SettingsPlaceholderView: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: DSSpacing.md) {
-                Text("settings.soon")
-                    .foregroundStyle(.secondary)
-            }
-            .padding()
-            .navigationTitle("settings.title")
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("common.close") { dismiss() }
-                }
-            }
-        }
-    }
-}
-
 #Preview {
     HomeView(
         viewModel: AppContainer.preview.makeHomeViewModel(),
-        locationViewModel: AppContainer.preview.makeLocationViewModel()
+        locationViewModel: AppContainer.preview.makeLocationViewModel(),
+        settingsViewModel: AppContainer.preview.makeSettingsViewModel()
     )
 }

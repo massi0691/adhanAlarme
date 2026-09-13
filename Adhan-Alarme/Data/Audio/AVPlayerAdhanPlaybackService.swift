@@ -1,5 +1,6 @@
 import AVFoundation
 import Foundation
+import Observation
 
 /// Moteur de lecture de l'Adhan via `AVPlayer` (voix, app active).
 /// Session `.playback` + `.spokenAudio` (optimisé voix ; Bluetooth A2DP et
@@ -9,6 +10,7 @@ import Foundation
 /// `AppContainer`), closures `[weak self]` : aucune fuite, rien à retirer.
 /// Poursuite en arrière-plan : capacité `audio` (Info.plist) + Now Playing.
 @MainActor
+@Observable
 final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
     private let audioStore: any MuezzinAudioStore
     private let nowPlaying: AdhanNowPlayingController

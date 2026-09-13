@@ -2,7 +2,7 @@ import Foundation
 
 /// Racine de composition (injection de dépendances).
 /// Production : dépôt réel (cache → API Aladhan → calcul local),
-/// localisation Core Location, recherche MapKit.
+/// localisation Core Location, recherche MapKit, audio AVPlayer.
 /// Previews : calcul local uniquement, position figée (aucun réseau).
 @MainActor
 final class AppContainer {
@@ -13,6 +13,8 @@ final class AppContainer {
     private let geocoder: any ReverseGeocoding
     private let resolver: any ActiveLocationResolving
     private let prayerTimesRepository: any PrayerTimesRepository
+    private let audioStore: any MuezzinAudioStore
+    private let playbackService: any AdhanPlaybackService
 
     init(
         settingsStore: any SettingsStoring,
@@ -21,7 +23,9 @@ final class AppContainer {
         searchService: any CitySearching,
         geocoder: any ReverseGeocoding,
         resolver: any ActiveLocationResolving,
-        prayerTimesRepository: any PrayerTimesRepository
+        prayerTimesRepository: any PrayerTimesRepository,
+        audioStore: any MuezzinAudioStore,
+        playbackService: any AdhanPlaybackService
     ) {
         self.settingsStore = settingsStore
         self.cityStore = cityStore
@@ -30,6 +34,8 @@ final class AppContainer {
         self.geocoder = geocoder
         self.resolver = resolver
         self.prayerTimesRepository = prayerTimesRepository
+        self.audioStore = audioStore
+        self.playbackService = playbackService
     }
 
     static var production: AppContainer {
@@ -49,6 +55,8 @@ final class AppContainer {
             local: LocalCalculationProvider(),
             cache: PrayerTimesCache()
         )
+        let audioStore = FileSystemMuezzinAudioStore()
+        let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore)
         return AppContainer(
             settingsStore: settings,
             cityStore: cities,
@@ -56,7 +64,9 @@ final class AppContainer {
             searchService: search,
             geocoder: geocoder,
             resolver: resolver,
-            prayerTimesRepository: repository
+            prayerTimesRepository: repository,
+            audioStore: audioStore,
+            playbackService: playback
         )
     }
 
@@ -73,6 +83,8 @@ final class AppContainer {
             local: local,
             cache: PrayerTimesCache(userDefaults: previewDefaults)
         )
+        let audioStore = FileSystemMuezzinAudioStore()
+        let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore)
         return AppContainer(
             settingsStore: settings,
             cityStore: cities,
@@ -80,7 +92,9 @@ final class AppContainer {
             searchService: search,
             geocoder: geocoder,
             resolver: StaticLocationResolver(),
-            prayerTimesRepository: repository
+            prayerTimesRepository: repository,
+            audioStore: audioStore,
+            playbackService: playback
         )
     }
 
@@ -103,6 +117,14 @@ final class AppContainer {
                 cityStore: cityStore,
                 settingsStore: settingsStore
             )
+        )
+    }
+
+    func makeSettingsViewModel() -> SettingsViewModel {
+        SettingsViewModel(
+            settingsStore: settingsStore,
+            audioStore: audioStore,
+            playback: playbackService
         )
     }
 }

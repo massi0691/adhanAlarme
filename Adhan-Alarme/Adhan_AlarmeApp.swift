@@ -8,7 +8,8 @@ struct Adhan_AlarmeApp: App {
         WindowGroup {
             HomeView(
                 viewModel: container.makeHomeViewModel(),
-                locationViewModel: container.makeLocationViewModel()
+                locationViewModel: container.makeLocationViewModel(),
+                settingsViewModel: container.makeSettingsViewModel()
             )
         }
     }
