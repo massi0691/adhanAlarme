@@ -70,6 +70,7 @@ struct SettingsViewModelTests {
         guard let defaults = UserDefaults(suiteName: "test.\(UUID().uuidString)") else { return nil }
         let local = LocalCalculationProvider()
         let language = LanguageSettings(settingsStore: UserDefaultsSettingsStore(userDefaults: defaults))
+        let appearance = AppearanceSettings(settingsStore: UserDefaultsSettingsStore(userDefaults: defaults))
         let viewModel = SettingsViewModel(
             settingsStore: UserDefaultsSettingsStore(userDefaults: defaults),
             audioStore: store,
@@ -85,7 +86,8 @@ struct SettingsViewModelTests {
             ),
             alertService: alerts,
             segments: segments,
-            language: language
+            language: language,
+            appearance: appearance
         )
         return (viewModel, defaults, alerts)
     }

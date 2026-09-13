@@ -21,6 +21,13 @@ struct SettingsView: View {
                         }
                     }
                 }
+                Section("settings.appearance.section") {
+                    Picker("settings.appearance.appearance", selection: appearanceBinding()) {
+                        ForEach(AppAppearance.allCases, id: \.self) { appearance in
+                            Text(LocalizedStringKey(appearance.titleKey)).tag(appearance)
+                        }
+                    }
+                }
                 Section("settings.calculation.section") {
                     Picker("settings.calculation.method", selection: methodBinding()) {
                         ForEach(CalculationMethod.allCases, id: \.self) { method in
@@ -192,6 +199,13 @@ struct SettingsView: View {
         case .bundled, .unavailable, nil:
             EmptyView()
         }
+    }
+
+    private func appearanceBinding() -> Binding<AppAppearance> {
+        Binding(
+            get: { viewModel.appearance },
+            set: { viewModel.setAppearance($0) }
+        )
     }
 
     private func languageBinding() -> Binding<AppLanguage> {

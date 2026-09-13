@@ -13,6 +13,7 @@ struct AppSettings: Sendable, Codable, Hashable {
         uniqueKeysWithValues: Prayer.allCases.map { ($0, .defaults(for: $0)) }
     )
     var appLanguage: AppLanguage = .system
+    var appearance: AppAppearance = .system
     /// Dernière position GPS connue (secours si le GPS est indisponible).
     var lastAutomaticCoordinates: Coordinates?
     /// Nom correspondant (géocodage inverse best-effort).

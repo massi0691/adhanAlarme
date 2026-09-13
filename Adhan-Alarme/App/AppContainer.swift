@@ -21,6 +21,8 @@ final class AppContainer {
     private let alertActionHandler: PrayerAlertActionHandler
     /// Langue de l'interface (observable, lue par l'app et les services).
     let languageSettings: LanguageSettings
+    /// Apparence (observable, lue par la racine de l'app).
+    let appearanceSettings: AppearanceSettings
 
     init(
         settingsStore: any SettingsStoring,
@@ -34,7 +36,8 @@ final class AppContainer {
         playbackService: any AdhanPlaybackService,
         alertService: any PrayerAlertService,
         alertActionHandler: PrayerAlertActionHandler,
-        languageSettings: LanguageSettings
+        languageSettings: LanguageSettings,
+        appearanceSettings: AppearanceSettings
     ) {
         self.settingsStore = settingsStore
         self.cityStore = cityStore
@@ -48,11 +51,13 @@ final class AppContainer {
         self.alertService = alertService
         self.alertActionHandler = alertActionHandler
         self.languageSettings = languageSettings
+        self.appearanceSettings = appearanceSettings
     }
 
     static var production: AppContainer {
         let settings = UserDefaultsSettingsStore()
         let languageSettings = LanguageSettings(settingsStore: settings)
+        let appearanceSettings = AppearanceSettings(settingsStore: settings)
         let cities = UserDefaultsCityStore()
         let location = CoreLocationService()
         let search = MapKitCitySearchService()
@@ -84,7 +89,8 @@ final class AppContainer {
             playbackService: playback,
             alertService: alerts,
             alertActionHandler: alertHandler,
-            languageSettings: languageSettings
+            languageSettings: languageSettings,
+            appearanceSettings: appearanceSettings
         )
         UNUserNotificationCenter.current().delegate = alertHandler
         return container
@@ -94,6 +100,7 @@ final class AppContainer {
         let previewDefaults = UserDefaults(suiteName: "preview") ?? .standard
         let settings = UserDefaultsSettingsStore(userDefaults: previewDefaults)
         let languageSettings = LanguageSettings(settingsStore: settings)
+        let appearanceSettings = AppearanceSettings(settingsStore: settings)
         let cities = UserDefaultsCityStore(userDefaults: previewDefaults)
         let location = CoreLocationService()
         let search = MapKitCitySearchService()
@@ -120,7 +127,8 @@ final class AppContainer {
             playbackService: playback,
             alertService: alerts,
             alertActionHandler: alertHandler,
-            languageSettings: languageSettings
+            languageSettings: languageSettings,
+            appearanceSettings: appearanceSettings
         )
     }
 
@@ -159,7 +167,8 @@ final class AppContainer {
             alertScheduler: SchedulePrayerAlertsUseCase(prayerTimes: getTimes, resolver: resolver, segments: FileSystemAdhanSegmentStore()),
             alertService: alertService,
             segments: FileSystemAdhanSegmentStore(),
-            language: languageSettings
+            language: languageSettings,
+            appearance: appearanceSettings
         )
     }
 }

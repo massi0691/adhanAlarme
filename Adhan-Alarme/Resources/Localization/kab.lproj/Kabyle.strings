@@ -120,3 +120,8 @@
 "language.system" = "Anagraw";
 "settings.language.language" = "Tutlayt n usnas";
 "settings.language.section" = "Tutlayt";
+"appearance.dark" = "Tallas";
+"appearance.light" = "Tafat";
+"appearance.system" = "Anagraw";
+"settings.appearance.appearance" = "Tignit";
+"settings.appearance.section" = "Tigni";

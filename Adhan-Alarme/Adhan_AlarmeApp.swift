@@ -13,6 +13,8 @@ struct Adhan_AlarmeApp: App {
             )
             .environment(\.locale, container.languageSettings.locale ?? Locale.current)
             .environment(\.layoutDirection, container.languageSettings.appLanguage.isRightToLeft ? .rightToLeft : .leftToRight)
+            .preferredColorScheme(container.appearanceSettings.colorScheme)
+            .tint(DSColors.brand)
         }
     }
 }

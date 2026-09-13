@@ -15,6 +15,7 @@ final class SettingsViewModel {
     private let alertService: any PrayerAlertService
     private let segments: any AdhanSegmentStore
     private let language: LanguageSettings
+    private let appearance: AppearanceSettings
 
     let voices: [Muezzin] = Muezzin.catalog
     private(set) var selectedMuezzinID: String
@@ -35,6 +36,7 @@ final class SettingsViewModel {
     private(set) var ishaAngle: Double = 17
     private(set) var manualAdjustments: [Prayer: Int] = [:]
     private(set) var appLanguage: AppLanguage = .system
+    private(set) var appearance: AppAppearance = .system
 
     /// Lecture directe du service : suivi temps réel (interruptions, fin…).
     var playbackState: AdhanPlaybackState { playback.state }
@@ -46,7 +48,8 @@ final class SettingsViewModel {
         alertScheduler: SchedulePrayerAlertsUseCase,
         alertService: any PrayerAlertService,
         segments: any AdhanSegmentStore,
-        language: LanguageSettings
+        language: LanguageSettings,
+        appearance: AppearanceSettings
     ) {
         self.settingsStore = settingsStore
         self.audioStore = audioStore
@@ -55,11 +58,13 @@ final class SettingsViewModel {
         self.alertService = alertService
         self.segments = segments
         self.language = language
+        self.appearance = appearance
         self.selectedMuezzinID = settingsStore.settings.selectedMuezzinID
         refreshAvailability()
         syncAlertState()
         syncCalculationState()
         syncLanguageState()
+        syncAppearanceState()
     }
 
     func refresh() {
@@ -68,6 +73,7 @@ final class SettingsViewModel {
         syncAlertState()
         syncCalculationState()
         syncLanguageState()
+        syncAppearanceState()
     }
 
     /// Sélection globale : voix par défaut + propagation aux 6 prières
@@ -224,6 +230,18 @@ final class SettingsViewModel {
 
     private func syncLanguageState() {
         appLanguage = language.appLanguage
+    }
+
+    // MARK: - Apparence
+
+    /// Apparence de l'interface (appliquée aussitôt à la racine).
+    func setAppearance(_ appearance: AppAppearance) {
+        self.appearance.setAppearance(appearance)
+        syncAppearanceState()
+    }
+
+    private func syncAppearanceState() {
+        appearance = self.appearance.appearance
     }
 
     // MARK: - Calcul
