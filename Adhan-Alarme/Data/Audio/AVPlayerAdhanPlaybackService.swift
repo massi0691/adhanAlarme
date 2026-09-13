@@ -119,8 +119,14 @@ final class AVPlayerAdhanPlaybackService: AdhanPlaybackService {
             }
             return duration.seconds
         }()
-        let bgModes = Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes")
-        Self.logger.info("playAdhan \(muezzin.id, privacy: .public) bgmodes=\(String(describing: bgModes), privacy: .public)")
+        // Diagnostic : quelles clés générées atterrissent vraiment dans
+        // l'app installée (le mécanisme INFOPLIST_KEY_ est suspecté).
+        let info = Bundle.main.infoDictionary ?? [:]
+        let bgModes = String(describing: info["UIBackgroundModes"])
+        let storyboard = String(describing: info["UILaunchStoryboardName"])
+        let locDesc = String(describing: info["NSLocationWhenInUseUsageDescription"])
+        let version = String(describing: info["CFBundleShortVersionString"])
+        Self.logger.info("ADHAN-DIAG-3 playAdhan \(muezzin.id, privacy: .public) bgmodes=\(bgModes, privacy: .public) storyboard=\(storyboard, privacy: .public) locdesc=\(locDesc, privacy: .public) version=\(version, privacy: .public)")
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, mode: .spokenAudio)
