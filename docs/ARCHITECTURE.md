@@ -337,3 +337,40 @@ audio/notifications) restent `Sendable`. Les délégués ObjC
   `Silencieux` → rien. Bascule accueil OFF → plus rien.
 - Permission refusée → message + lien Réglages système.
 - Astuce : avancer l'horloge système déclenche les notifications dues.
+
+## 11. Réglages de calcul (phase 5)
+
+### 11.1 Chaîne déjà câblée (phases 1-2)
+- `PrayerCalculationConfiguration` (méthode, Asr, haute latitude,
+  angles Fajr/Isha, ajustements manuels) → `CalculationParameters`
+  (angles effectifs, facteur d'ombre, règle) → `PrayerCalculator`
+  (angles par méthode, Maghrib/Isha angulaires ou à intervalle,
+  ajustements haute latitude type PrayTimes).
+- API Aladhan : `method` (12 méthodes, UOIF = 12), `school` (Asr),
+  `latitudeAdjustmentMethod` ; angles personnalisés → contournement
+  API, calcul local seul (cohérence en/hors-ligne).
+- Dépôt : cache (clé incluant la configuration) → API → local ;
+  ajustements méthode (ex. Diyanet) + manuels additionnés.
+
+### 11.2 Interface Réglages (phase 5)
+- Section Calcul : méthode (12), Asr, hautes latitudes, angles
+  personnalisés (toggle + pas de 0,5°, bornés 5–25°, reprise des
+  angles de la méthode à l'activation), ajustements manuels par
+  prière (écran dédié, ±30 min, 0 = effacé).
+- Tout changement recalcule : recharge accueil à la fermeture de la
+  feuille + replanification des alertes (le planificateur relit la
+  configuration).
+
+### 11.3 Tests
+- `SettingsViewModelTests` (+ 5 : méthode/Asr/règle, angles
+  personnalisés + bornes, ajustements). Moteur, API et dépôt déjà
+  couverts (phases 1-2, golden tests vs API réelle : recette Xcode).
+
+### 11.4 Recette manuelle
+- `⌘B` + `⌘U`.
+- Changer de méthode (MWL → UOIF) → Fajr/Isha décalés dès la
+  fermeture de Réglages (12° vs 18°/17°).
+- Asr Hanafi → Asr retardé ; angles personnalisés → API contournée
+  (cohérence en/hors-ligne) ; ajustement +5 Fajr → Fajr +5 min.
+- Alertes replanifiées avec les nouveaux horaires (vérifiable en
+  `lldb` via `getPendingNotificationRequests`).

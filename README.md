@@ -27,7 +27,8 @@ Limitations iOS (Adhan auto, 30 s, 64 notifications) :
 - [ ] **Phase 3 (Xcode)** — `⌘B` + `⌘U` + recette manuelle (§9.6)
 - [x] **Phase 4** — Notifications, rolling schedule, réglages d'alerte
 - [ ] **Phase 4 (Xcode)** — `⌘B` + `⌘U` + recette manuelle (§10.8)
-- [ ] **Phase 5** — Méthodes de calcul, Asr, hautes latitudes, ajustements
+- [x] **Phase 5** — Méthodes de calcul, Asr, hautes latitudes, ajustements
+- [ ] **Phase 5 (Xcode)** — `⌘B` + `⌘U` + recette manuelle (§11.4)
 - [ ] **Phase 6** — Multilingue complet, sélecteur in-app, RTL, kabyle validé
 - [ ] **Phase 7** — Tests UI, accessibilité, optimisation, publication
 
