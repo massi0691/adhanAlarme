@@ -113,9 +113,9 @@ struct HomeView: View {
     private func greetingKey(for date: Date) -> String {
         let hour = Calendar.current.component(.hour, from: date)
         switch hour {
-        case 0..<12: "home.greeting.morning"
-        case 12..<18: "home.greeting.afternoon"
-        default: "home.greeting.evening"
+        case 0..<12: return "home.greeting.morning"
+        case 12..<18: return "home.greeting.afternoon"
+        default: return "home.greeting.evening"
         }
     }
 }
