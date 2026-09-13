@@ -18,8 +18,8 @@ enum PrayerAlertContentFactory {
         case .adhan:
             content.categoryIdentifier = PrayerAlertCategories.adhan
             content.interruptionLevel = .timeSensitive
-            if let customSoundName {
-                content.sound = UNNotificationSound(named: UNNotificationSoundName(customSoundName))
+            if let soundName = request.soundName ?? customSoundName {
+                content.sound = UNNotificationSound(named: UNNotificationSoundName(soundName))
             } else {
                 content.sound = .default
             }

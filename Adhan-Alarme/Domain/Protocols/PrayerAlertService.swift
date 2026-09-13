@@ -13,4 +13,8 @@ protocol PrayerAlertService {
     /// Erreurs : `permissionDenied`, `schedulingFailed`.
     func schedule(_ requests: [PrayerAlertRequest]) async throws
     func cancelAllAlerts() async
+    /// Annule les segments restants d'une occurrence (Adhan long),
+    /// par préfixe `adhan.<prière>.<AAAAMMJJ>` (voir `dayIdentifier`).
+    /// Sans effet sur les notifications uniques déjà tirées.
+    func cancelChainedSegments(dayIdentifier: String) async
 }

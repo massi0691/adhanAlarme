@@ -43,13 +43,21 @@ struct SettingsViewModelTests {
         }
     }
 
+    private struct StubSegments: AdhanSegmentStore {
+        var names: [String]?
+        func segmentSoundNames(for muezzinID: String) -> [String]? { names }
+        func prepareSegments(for muezzin: Muezzin, sourceURL: URL) async throws -> [String] { names ?? [] }
+    }
+
     private final class MockAlertService: PrayerAlertService {
         var status: PrayerAlertAuthorization = .authorized
         var scheduled: [[PrayerAlertRequest]] = []
+        var cancelledPrefixes: [String] = []
         func authorizationStatus() async -> PrayerAlertAuthorization { status }
         func requestAuthorization() async -> PrayerAlertAuthorization { status }
         func schedule(_ requests: [PrayerAlertRequest]) async throws { scheduled.append(requests) }
         func cancelAllAlerts() async {}
+        func cancelChainedSegments(dayIdentifier: String) async { cancelledPrefixes.append(dayIdentifier) }
     }
 
     private func makeWorld(
@@ -69,7 +77,8 @@ struct SettingsViewModelTests {
                     local: local,
                     cache: PrayerTimesCache(userDefaults: defaults)
                 )),
-                resolver: StaticLocationResolver()
+                resolver: StaticLocationResolver(),
+                segments: StubSegments()
             ),
             alertService: alerts
         )

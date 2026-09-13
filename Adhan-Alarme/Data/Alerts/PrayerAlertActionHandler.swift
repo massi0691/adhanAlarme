@@ -30,9 +30,11 @@ private extension CompletionBox where Value == Void {
 @MainActor
 final class PrayerAlertActionHandler: NSObject, UNUserNotificationCenterDelegate {
     private let playback: any AdhanPlaybackService
+    private let alerts: any PrayerAlertService
 
-    init(playback: any AdhanPlaybackService) {
+    init(playback: any AdhanPlaybackService, alerts: any PrayerAlertService) {
         self.playback = playback
+        self.alerts = alerts
         super.init()
     }
 
@@ -44,8 +46,13 @@ final class PrayerAlertActionHandler: NSObject, UNUserNotificationCenterDelegate
         let info = notification.request.content.userInfo
         let mode = info[PrayerAlertUserInfo.mode] as? String
         let muezzinID = info[PrayerAlertUserInfo.muezzinID] as? String
+        let prayer = info[PrayerAlertUserInfo.prayer] as? String
+        let fireInterval = info[PrayerAlertUserInfo.fireDate] as? Double
         let completion = CompletionBox(completionHandler)
         Task { @MainActor in
+            // App ouverte : les segments chaînés sont annulés (la lecture
+            // AVPlayer prend le relais, ou la bannière suffit).
+            await self.cancelRemainingSegments(prayer: prayer, fireInterval: fireInterval)
             // App ouverte + mode Adhan : lecture complète, pas de bannière.
             // Sinon (ou échec) : bannière + son.
             if mode == PrayerAlertMode.adhan.rawValue,
@@ -70,13 +77,27 @@ final class PrayerAlertActionHandler: NSObject, UNUserNotificationCenterDelegate
         let action = response.actionIdentifier
         let info = response.notification.request.content.userInfo
         let muezzinID = info[PrayerAlertUserInfo.muezzinID] as? String
+        let prayer = info[PrayerAlertUserInfo.prayer] as? String
+        let fireInterval = info[PrayerAlertUserInfo.fireDate] as? Double
         let completion = CompletionBox<Void>(completionHandler)
         Task { @MainActor in
+            // Toute interaction annule les segments restants.
+            await self.cancelRemainingSegments(prayer: prayer, fireInterval: fireInterval)
             if action == PrayerAlertCategories.listenAction,
                let muezzin = muezzinID.flatMap(Muezzin.withID) ?? Muezzin.withID(Muezzin.defaultID) {
                 try? await self.playback.playAdhan(muezzin)
             }
             completion.call()
         }
+    }
+
+    /// Annule les segments chaînés restants d'une occurrence (Adhan long).
+    private func cancelRemainingSegments(prayer: String?, fireInterval: Double?) async {
+        guard let prayer, let prayerValue = Prayer(rawValue: prayer), let fireInterval else { return }
+        let dayID = PrayerAlertRequest.dayIdentifier(
+            prayer: prayerValue,
+            fireDate: Date(timeIntervalSince1970: fireInterval)
+        )
+        await alerts.cancelChainedSegments(dayIdentifier: dayID)
     }
 }

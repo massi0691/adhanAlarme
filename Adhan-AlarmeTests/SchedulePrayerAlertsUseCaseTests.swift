@@ -72,14 +72,23 @@ struct SchedulePrayerAlertsUseCaseTests {
         }
     }
 
+    /// Segments factices : `nil` = non préparés (repli notification unique).
+    private struct StubSegments: AdhanSegmentStore {
+        var names: [String]?
+        func segmentSoundNames(for muezzinID: String) -> [String]? { names }
+        func prepareSegments(for muezzin: Muezzin, sourceURL: URL) async throws -> [String] { names ?? [] }
+    }
+
     private func useCase(
         repository: any PrayerTimesRepository = FixedRepository(),
         resolver: any ActiveLocationResolving = FixedResolver(),
+        segments: StubSegments = StubSegments(),
         days: Int = 7
     ) -> SchedulePrayerAlertsUseCase {
         SchedulePrayerAlertsUseCase(
             prayerTimes: GetPrayerTimesUseCase(repository: repository),
             resolver: resolver,
+            segments: segments,
             days: days
         )
     }

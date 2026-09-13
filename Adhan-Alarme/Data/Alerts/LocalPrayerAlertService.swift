@@ -66,6 +66,12 @@ final class LocalPrayerAlertService: PrayerAlertService {
         center.removeAllPendingNotificationRequests()
     }
 
+    func cancelChainedSegments(dayIdentifier: String) async {
+        let pending = await center.pendingNotificationRequests()
+        let identifiers = pending.map(\.identifier).filter { $0.hasPrefix(dayIdentifier) }
+        center.removePendingNotificationRequests(withIdentifiers: identifiers)
+    }
+
     // MARK: - Privé
 
     private func registerCategories() {
