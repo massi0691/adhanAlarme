@@ -37,8 +37,16 @@ final class SettingsViewModel {
         refreshAvailability()
     }
 
+    /// Sélection globale : voix par défaut + propagation aux 6 prières
+    /// (les alertes embarquent la voix de chaque prière ; voix par prière
+    /// personnalisables dans une phase ultérieure).
     func select(_ muezzin: Muezzin) {
-        settingsStore.settings.selectedMuezzinID = muezzin.id
+        var settings = settingsStore.settings
+        settings.selectedMuezzinID = muezzin.id
+        for prayer in Prayer.allCases {
+            settings.prayerPreferences[prayer]?.selectedMuezzinID = muezzin.id
+        }
+        settingsStore.settings = settings
         selectedMuezzinID = muezzin.id
     }
 

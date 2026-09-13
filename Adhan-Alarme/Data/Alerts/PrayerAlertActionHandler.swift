@@ -1,0 +1,80 @@
+import Foundation
+import UserNotifications
+
+/// Boîte `Sendable` pour les completion handlers système (contrat Apple :
+/// appelables depuis n'importe quel thread, exactement une fois).
+private struct CompletionBox<Value>: @unchecked Sendable {
+    private let handler: (Value) -> Void
+
+    init(_ handler: @escaping (Value) -> Void) {
+        self.handler = handler
+    }
+
+    func call(_ value: Value) {
+        handler(value)
+    }
+}
+
+private extension CompletionBox where Value == Void {
+    func call() {
+        handler(())
+    }
+}
+
+/// Réponses aux notifications : lecture auto quand l'app est ouverte à
+/// l'heure (la bannière est alors supprimée — l'Adhan EST l'alerte),
+/// action « Écouter » sinon. Tap du corps : ouvre l'app, sans lecture.
+/// Valeurs `userInfo` extraites AVANT le saut MainActor (`Sendable`).
+@MainActor
+final class PrayerAlertActionHandler: NSObject, UNUserNotificationCenterDelegate {
+    private let playback: any AdhanPlaybackService
+
+    init(playback: any AdhanPlaybackService) {
+        self.playback = playback
+        super.init()
+    }
+
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        let info = notification.request.content.userInfo
+        let mode = info[PrayerAlertUserInfo.mode] as? String
+        let muezzinID = info[PrayerAlertUserInfo.muezzinID] as? String
+        let completion = CompletionBox(completionHandler)
+        Task { @MainActor in
+            // App ouverte + mode Adhan : lecture complète, pas de bannière.
+            // Sinon (ou échec) : bannière + son.
+            if mode == PrayerAlertMode.adhan.rawValue,
+               let muezzin = muezzinID.flatMap(Muezzin.withID) ?? Muezzin.withID(Muezzin.defaultID) {
+                do {
+                    try await self.playback.playAdhan(muezzin)
+                    completion.call([])
+                    return
+                } catch {
+                    // Repli bannière ci-dessous.
+                }
+            }
+            completion.call([.banner, .sound])
+        }
+    }
+
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        let action = response.actionIdentifier
+        let info = response.notification.request.content.userInfo
+        let muezzinID = info[PrayerAlertUserInfo.muezzinID] as? String
+        let completion = CompletionBox<Void>(completionHandler)
+        Task { @MainActor in
+            if action == PrayerAlertCategories.listenAction,
+               let muezzin = muezzinID.flatMap(Muezzin.withID) ?? Muezzin.withID(Muezzin.defaultID) {
+                try? await self.playback.playAdhan(muezzin)
+            }
+            completion.call()
+        }
+    }
+}

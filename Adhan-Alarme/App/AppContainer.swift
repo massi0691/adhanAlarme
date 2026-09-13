@@ -1,8 +1,10 @@
 import Foundation
+import UserNotifications
 
 /// Racine de composition (injection de dépendances).
 /// Production : dépôt réel (cache → API Aladhan → calcul local),
-/// localisation Core Location, recherche MapKit, audio AVPlayer.
+/// localisation Core Location, recherche MapKit, audio AVPlayer,
+/// alertes système (délégué assigné ici, production uniquement).
 /// Previews : calcul local uniquement, position figée (aucun réseau).
 @MainActor
 final class AppContainer {
@@ -15,6 +17,8 @@ final class AppContainer {
     private let prayerTimesRepository: any PrayerTimesRepository
     private let audioStore: any MuezzinAudioStore
     private let playbackService: any AdhanPlaybackService
+    private let alertService: any PrayerAlertService
+    private let alertActionHandler: PrayerAlertActionHandler
 
     init(
         settingsStore: any SettingsStoring,
@@ -25,7 +29,9 @@ final class AppContainer {
         resolver: any ActiveLocationResolving,
         prayerTimesRepository: any PrayerTimesRepository,
         audioStore: any MuezzinAudioStore,
-        playbackService: any AdhanPlaybackService
+        playbackService: any AdhanPlaybackService,
+        alertService: any PrayerAlertService,
+        alertActionHandler: PrayerAlertActionHandler
     ) {
         self.settingsStore = settingsStore
         self.cityStore = cityStore
@@ -36,6 +42,8 @@ final class AppContainer {
         self.prayerTimesRepository = prayerTimesRepository
         self.audioStore = audioStore
         self.playbackService = playbackService
+        self.alertService = alertService
+        self.alertActionHandler = alertActionHandler
     }
 
     static var production: AppContainer {
@@ -57,7 +65,9 @@ final class AppContainer {
         )
         let audioStore = FileSystemMuezzinAudioStore()
         let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore)
-        return AppContainer(
+        let alerts = LocalPrayerAlertService()
+        let alertHandler = PrayerAlertActionHandler(playback: playback)
+        let container = AppContainer(
             settingsStore: settings,
             cityStore: cities,
             locationService: location,
@@ -66,8 +76,12 @@ final class AppContainer {
             resolver: resolver,
             prayerTimesRepository: repository,
             audioStore: audioStore,
-            playbackService: playback
+            playbackService: playback,
+            alertService: alerts,
+            alertActionHandler: alertHandler
         )
+        UNUserNotificationCenter.current().delegate = alertHandler
+        return container
     }
 
     static var preview: AppContainer {
@@ -85,6 +99,8 @@ final class AppContainer {
         )
         let audioStore = FileSystemMuezzinAudioStore()
         let playback = AVPlayerAdhanPlaybackService(audioStore: audioStore)
+        let alerts = LocalPrayerAlertService()
+        let alertHandler = PrayerAlertActionHandler(playback: playback)
         return AppContainer(
             settingsStore: settings,
             cityStore: cities,
@@ -94,7 +110,9 @@ final class AppContainer {
             resolver: StaticLocationResolver(),
             prayerTimesRepository: repository,
             audioStore: audioStore,
-            playbackService: playback
+            playbackService: playback,
+            alertService: alerts,
+            alertActionHandler: alertHandler
         )
     }
 
