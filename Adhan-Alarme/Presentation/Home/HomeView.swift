@@ -25,7 +25,7 @@ struct HomeView: View {
             .task {
                 await viewModel.load()
             }
-            .onReceive(NotificationCenter.default.publisher(for: NSSystemTimeZoneDidChangeNotification)) { _ in
+            .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
                 Task { await viewModel.load() }
             }
             .sheet(isPresented: $showingSettings) {
