@@ -26,6 +26,16 @@ struct HomeView: View {
             .task {
                 await viewModel.load()
             }
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                    .accessibilityLabel(Text("settings.title"))
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
                 Task { await viewModel.load() }
             }
@@ -69,40 +79,27 @@ struct HomeView: View {
     }
 
     private func header(now: Date) -> some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: DSSpacing.xs) {
-                Text(LocalizedStringKey(greetingKey(for: now)))
-                    .font(DSTypography.greeting)
-                NavigationLink {
-                    LocationView(viewModel: locationViewModel)
-                } label: {
-                    HStack(spacing: DSSpacing.xs) {
-                        Label {
-                            Text(viewModel.cityName)
-                        } icon: {
-                            Image(systemName: "mappin.circle.fill")
-                        }
-                        Image(systemName: layoutDirection == .rightToLeft ? "chevron.left" : "chevron.right")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                    }
-                    .font(DSTypography.city)
-                    .foregroundStyle(DSColors.secondaryText)
-                }
-            }
-            Spacer()
-            Button {
-                showingSettings = true
+        VStack(alignment: .leading, spacing: DSSpacing.xs) {
+            Text(LocalizedStringKey(greetingKey(for: now)))
+                .font(DSTypography.greeting)
+            NavigationLink {
+                LocationView(viewModel: locationViewModel)
             } label: {
-                Image(systemName: "gearshape")
-                    .font(.title2)
-                    .foregroundStyle(DSColors.brand)
-                    .padding(DSSpacing.sm)
-                    .background(DSColors.brand.opacity(0.12))
-                    .clipShape(Circle())
+                HStack(spacing: DSSpacing.xs) {
+                    Label {
+                        Text(viewModel.cityName)
+                    } icon: {
+                        Image(systemName: "mappin.circle.fill")
+                    }
+                    Image(systemName: layoutDirection == .rightToLeft ? "chevron.left" : "chevron.right")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                }
+                .font(DSTypography.city)
+                .foregroundStyle(DSColors.secondaryText)
             }
-            .accessibilityLabel(Text("settings.title"))
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundStyle(DSColors.primaryText)
     }
 
