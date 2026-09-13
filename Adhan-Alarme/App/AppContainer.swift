@@ -146,6 +146,7 @@ final class AppContainer {
         return SettingsViewModel(
             settingsStore: settingsStore,
             audioStore: audioStore,
+            segments: FileSystemAdhanSegmentStore(),
             playback: playbackService,
             alertScheduler: SchedulePrayerAlertsUseCase(prayerTimes: getTimes, resolver: resolver, segments: FileSystemAdhanSegmentStore()),
             alertService: alertService

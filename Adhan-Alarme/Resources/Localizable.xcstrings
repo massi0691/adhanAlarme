@@ -1274,6 +1274,54 @@
         }
       }
     },
+    "settings.alerts.longAdhan": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adhan long (expérimental)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Long Adhan (experimental)"
+          }
+        }
+      }
+    },
+    "settings.alerts.longAdhanHint": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enchaîne des extraits de 30 s (≈ 8 bannières par prière, couverture ≈ 1 jour). La voix doit être téléchargée."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chains 30-second excerpts (≈ 8 banners per prayer, ≈ 1 day of coverage). The voice must be downloaded."
+          }
+        }
+      }
+    },
+    "settings.alerts.longAdhanNeedsDownload": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Téléchargez d'abord la voix pour activer l'Adhan long."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download the voice first to enable Long Adhan."
+          }
+        }
+      }
+    },
     "settings.alerts.mode.adhan": {
       "localizations": {
         "fr": {
@@ -1334,6 +1382,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Open Settings"
+          }
+        }
+      }
+    },
+    "settings.alerts.preparingLongAdhan": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préparation des extraits…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing excerpts…"
           }
         }
       }

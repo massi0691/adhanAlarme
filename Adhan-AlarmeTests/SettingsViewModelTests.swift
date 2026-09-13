@@ -63,7 +63,8 @@ struct SettingsViewModelTests {
     private func makeWorld(
         store: MockAudioStore = MockAudioStore(),
         playback: MockPlayback = MockPlayback(),
-        alerts: MockAlertService = MockAlertService()
+        alerts: MockAlertService = MockAlertService(),
+        segments: StubSegments = StubSegments()
     ) -> (viewModel: SettingsViewModel, defaults: UserDefaults, alerts: MockAlertService)? {
         guard let defaults = UserDefaults(suiteName: "test.\(UUID().uuidString)") else { return nil }
         let local = LocalCalculationProvider()
@@ -80,7 +81,8 @@ struct SettingsViewModelTests {
                 resolver: StaticLocationResolver(),
                 segments: StubSegments()
             ),
-            alertService: alerts
+            alertService: alerts,
+            segments: segments
         )
         return (viewModel, defaults, alerts)
     }

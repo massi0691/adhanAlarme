@@ -82,6 +82,22 @@ struct SettingsView: View {
                                 }
                             }
                         }
+                        Toggle("settings.alerts.longAdhan", isOn: Binding(
+                            get: { viewModel.longAdhanEnabled },
+                            set: { enabled in
+                                Task { await viewModel.setLongAdhanEnabled(enabled) }
+                            }
+                        ))
+                        .disabled(viewModel.isPreparingLongAdhan)
+                        if viewModel.isPreparingLongAdhan {
+                            ProgressView {
+                                Text("settings.alerts.preparingLongAdhan")
+                            }
+                        } else {
+                            Text("settings.alerts.longAdhanHint")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
                 Section("settings.voice.section") {

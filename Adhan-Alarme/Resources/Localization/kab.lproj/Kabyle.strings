@@ -109,3 +109,7 @@
 "settings.calculation.method" = "Tarrayt";
 "settings.calculation.section" = "Asiḍen n wakuden";
 "settings.calculation.minutesFormat" = "%+d tusdatin";
+"settings.alerts.longAdhan" = "Ladhan ɣezzifen (experimental)";
+"settings.alerts.longAdhanHint" = "Yeqqen tiktarin n 30 n tesdatin (≈ 8 tilɣa i yal tzallit). Ilaq asseɣret n taɣect.";
+"settings.alerts.longAdhanNeedsDownload" = "Sider taɣect uqbel ad serrḥeḍ Ladhan ɣezzifen.";
+"settings.alerts.preparingLongAdhan" = "Aseggeti n tiktarin…";

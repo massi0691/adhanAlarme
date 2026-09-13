@@ -13,6 +13,7 @@ final class SettingsViewModel {
     private let playback: any AdhanPlaybackService
     private let alertScheduler: SchedulePrayerAlertsUseCase
     private let alertService: any PrayerAlertService
+    private let segments: any AdhanSegmentStore
 
     let voices: [Muezzin] = Muezzin.catalog
     private(set) var selectedMuezzinID: String
@@ -23,6 +24,8 @@ final class SettingsViewModel {
     /// Miroir de l'interrupteur global (partagé avec l'accueil).
     private(set) var alertsEnabled = true
     private(set) var alertModes: [Prayer: PrayerAlertMode] = [:]
+    private(set) var longAdhanEnabled = false
+    private(set) var isPreparingLongAdhan = false
     private(set) var calculationMethod: CalculationMethod = .muslimWorldLeague
     private(set) var asrMethod: AsrMethod = .standard
     private(set) var highLatitudeRule: HighLatitudeRule = .middleOfNight
@@ -39,13 +42,15 @@ final class SettingsViewModel {
         audioStore: any MuezzinAudioStore,
         playback: any AdhanPlaybackService,
         alertScheduler: SchedulePrayerAlertsUseCase,
-        alertService: any PrayerAlertService
+        alertService: any PrayerAlertService,
+        segments: any AdhanSegmentStore
     ) {
         self.settingsStore = settingsStore
         self.audioStore = audioStore
         self.playback = playback
         self.alertScheduler = alertScheduler
         self.alertService = alertService
+        self.segments = segments
         self.selectedMuezzinID = settingsStore.settings.selectedMuezzinID
         refreshAvailability()
         syncAlertState()
@@ -151,6 +156,34 @@ final class SettingsViewModel {
         Task { await refreshAlerts() }
     }
 
+    /// Hack « Adhan long » (expérimental, opt-in) : à l'activation,
+    /// découpe la voix globale en segments de 30 s puis replanifie
+    /// (v1 : seule la voix globale est découpée, propagée aux prières).
+    func setLongAdhanEnabled(_ enabled: Bool) async {
+        guard enabled else {
+            settingsStore.settings.longAdhanEnabled = false
+            longAdhanEnabled = false
+            await refreshAlerts()
+            return
+        }
+        guard let muezzin = Muezzin.withID(settingsStore.settings.selectedMuezzinID),
+              let sourceURL = audioStore.localURL(for: muezzin) else {
+            errorKey = "settings.alerts.longAdhanNeedsDownload"
+            return
+        }
+        errorKey = nil
+        isPreparingLongAdhan = true
+        do {
+            _ = try await segments.prepareSegments(for: muezzin, sourceURL: sourceURL)
+            settingsStore.settings.longAdhanEnabled = true
+            longAdhanEnabled = true
+            await refreshAlerts()
+        } catch {
+            errorKey = "audio.error.failed"
+        }
+        isPreparingLongAdhan = false
+    }
+
     /// État de l'autorisation système (lu à l'ouverture de Réglages).
     func loadAlertAuthorization() async {
         alertAuthorization = await alertService.authorizationStatus()
@@ -158,6 +191,7 @@ final class SettingsViewModel {
 
     private func syncAlertState() {
         alertsEnabled = settingsStore.settings.globalAdhanEnabled
+        longAdhanEnabled = settingsStore.settings.longAdhanEnabled
         alertModes = Dictionary(uniqueKeysWithValues: settingsStore.settings.prayerPreferences.map {
             ($0.key, $0.value.mode)
         })
