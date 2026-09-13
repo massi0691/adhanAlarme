@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Écran Réglages (feuille depuis l'accueil) : calcul des horaires
-/// (méthode, Asr, hautes latitudes, angles, ajustements), alertes par
-/// prière et voix de l'Adhan (sélection, téléchargement, aperçu).
+/// Écran Réglages (feuille depuis l'accueil) : langue, calcul des
+/// horaires (méthode, Asr, hautes latitudes, angles, ajustements),
+/// alertes par prière et voix de l'Adhan (sélection, téléchargement).
 struct SettingsView: View {
     @State private var viewModel: SettingsViewModel
     @Environment(\.dismiss) private var dismiss
@@ -14,6 +14,13 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("settings.language.section") {
+                    Picker("settings.language.language", selection: languageBinding()) {
+                        ForEach(AppLanguage.allCases, id: \.self) { language in
+                            Text(LocalizedStringKey(language.titleKey)).tag(language)
+                        }
+                    }
+                }
                 Section("settings.calculation.section") {
                     Picker("settings.calculation.method", selection: methodBinding()) {
                         ForEach(CalculationMethod.allCases, id: \.self) { method in
@@ -185,6 +192,13 @@ struct SettingsView: View {
         case .bundled, .unavailable, nil:
             EmptyView()
         }
+    }
+
+    private func languageBinding() -> Binding<AppLanguage> {
+        Binding(
+            get: { viewModel.appLanguage },
+            set: { viewModel.setAppLanguage($0) }
+        )
     }
 
     private func methodBinding() -> Binding<CalculationMethod> {

@@ -14,6 +14,7 @@ final class SettingsViewModel {
     private let alertScheduler: SchedulePrayerAlertsUseCase
     private let alertService: any PrayerAlertService
     private let segments: any AdhanSegmentStore
+    private let language: LanguageSettings
 
     let voices: [Muezzin] = Muezzin.catalog
     private(set) var selectedMuezzinID: String
@@ -33,6 +34,7 @@ final class SettingsViewModel {
     private(set) var fajrAngle: Double = 18
     private(set) var ishaAngle: Double = 17
     private(set) var manualAdjustments: [Prayer: Int] = [:]
+    private(set) var appLanguage: AppLanguage = .system
 
     /// Lecture directe du service : suivi temps réel (interruptions, fin…).
     var playbackState: AdhanPlaybackState { playback.state }
@@ -43,7 +45,8 @@ final class SettingsViewModel {
         playback: any AdhanPlaybackService,
         alertScheduler: SchedulePrayerAlertsUseCase,
         alertService: any PrayerAlertService,
-        segments: any AdhanSegmentStore
+        segments: any AdhanSegmentStore,
+        language: LanguageSettings
     ) {
         self.settingsStore = settingsStore
         self.audioStore = audioStore
@@ -51,10 +54,12 @@ final class SettingsViewModel {
         self.alertScheduler = alertScheduler
         self.alertService = alertService
         self.segments = segments
+        self.language = language
         self.selectedMuezzinID = settingsStore.settings.selectedMuezzinID
         refreshAvailability()
         syncAlertState()
         syncCalculationState()
+        syncLanguageState()
     }
 
     func refresh() {
@@ -62,6 +67,7 @@ final class SettingsViewModel {
         refreshAvailability()
         syncAlertState()
         syncCalculationState()
+        syncLanguageState()
     }
 
     /// Sélection globale : voix par défaut + propagation aux 6 prières
@@ -204,6 +210,20 @@ final class SettingsViewModel {
         } catch {
             // Best-effort : les réglages restent valides sans planification.
         }
+    }
+
+    // MARK: - Langue
+
+    /// Langue de l'interface (replanifie les alertes : les chaînes des
+    /// notifications sont pré-rendues dans la langue de l'app).
+    func setAppLanguage(_ language: AppLanguage) {
+        self.language.appLanguage = language
+        syncLanguageState()
+        Task { await refreshAlerts() }
+    }
+
+    private func syncLanguageState() {
+        appLanguage = language.appLanguage
     }
 
     // MARK: - Calcul

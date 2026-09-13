@@ -23,3 +23,16 @@ enum AppLanguage: String, Sendable, Codable, CaseIterable, Hashable {
 
     var isRightToLeft: Bool { self == .arabic }
 }
+
+extension AppLanguage {
+    /// Clé localisée du nom affiché (endonymes).
+    var titleKey: String {
+        switch self {
+        case .system: "language.system"
+        case .french: "language.french"
+        case .english: "language.english"
+        case .arabic: "language.arabic"
+        case .kabyle: "language.kabyle"
+        }
+    }
+}

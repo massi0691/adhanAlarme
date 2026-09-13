@@ -113,3 +113,10 @@
 "settings.alerts.longAdhanHint" = "Yeqqen tiktarin n 30 n tesdatin (≈ 8 tilɣa i yal tzallit). Ilaq asseɣret n taɣect.";
 "settings.alerts.longAdhanNeedsDownload" = "Sider taɣect uqbel ad serrḥeḍ Ladhan ɣezzifen.";
 "settings.alerts.preparingLongAdhan" = "Aseggeti n tiktarin…";
+"language.arabic" = "Taɛrabt";
+"language.english" = "Taglizit";
+"language.french" = "Tafransist";
+"language.kabyle" = "Taqbaylit";
+"language.system" = "Anagraw";
+"settings.language.language" = "Tutlayt n usnas";
+"settings.language.section" = "Tutlayt";

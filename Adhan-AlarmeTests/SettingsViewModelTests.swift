@@ -69,6 +69,7 @@ struct SettingsViewModelTests {
     ) -> (viewModel: SettingsViewModel, defaults: UserDefaults, alerts: MockAlertService)? {
         guard let defaults = UserDefaults(suiteName: "test.\(UUID().uuidString)") else { return nil }
         let local = LocalCalculationProvider()
+        let language = LanguageSettings(settingsStore: UserDefaultsSettingsStore(userDefaults: defaults))
         let viewModel = SettingsViewModel(
             settingsStore: UserDefaultsSettingsStore(userDefaults: defaults),
             audioStore: store,
@@ -83,7 +84,8 @@ struct SettingsViewModelTests {
                 segments: StubSegments()
             ),
             alertService: alerts,
-            segments: segments
+            segments: segments,
+            language: language
         )
         return (viewModel, defaults, alerts)
     }

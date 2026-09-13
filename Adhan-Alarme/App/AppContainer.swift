@@ -157,7 +157,8 @@ final class AppContainer {
             playback: playbackService,
             alertScheduler: SchedulePrayerAlertsUseCase(prayerTimes: getTimes, resolver: resolver, segments: FileSystemAdhanSegmentStore()),
             alertService: alertService,
-            segments: FileSystemAdhanSegmentStore()
+            segments: FileSystemAdhanSegmentStore(),
+            language: languageSettings
         )
     }
 }
