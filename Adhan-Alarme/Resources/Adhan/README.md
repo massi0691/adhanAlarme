@@ -25,3 +25,13 @@ cache + suppression).
 Les sons de notification iOS sont limités à **moins de 30 secondes**
 (`aiff`, `wav` ou `caf`, voir `docs/IOS_LIMITATIONS.md`). Prévoir un extrait
 court dédié, ex. `adhan-short.caf`, distinct des fichiers complets ci-dessus.
+
+## Téléchargement (phase 3)
+
+Ordre de résolution : fichier bundle → cache téléchargé → téléchargement.
+- Cache : `Application Support/Adhan/` (exclu de la sauvegarde iCloud,
+  contenu re-téléchargeable), supprimable voix par voix depuis Réglages.
+- Pour activer le téléchargement d'une voix : renseigner `remoteURL` dans
+  `Muezzin.catalog` (URL https stable vers le MP3, source autorisée).
+- Téléchargement au premier plan avec progression (pas de session
+  d'arrière-plan en v1 : l'app reste ouverte pendant le transfert).
