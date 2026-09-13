@@ -4,7 +4,9 @@ import UserNotifications
 /// Boîte `Sendable` pour les completion handlers système (contrat Apple :
 /// appelables depuis n'importe quel thread, exactement une fois).
 private struct CompletionBox<Value>: @unchecked Sendable {
-    private let handler: (Value) -> Void
+    // Écrit une fois à l'init, jamais muté ensuite : partage sûr
+    // (même contrat Apple que la boîte : handler appelable partout).
+    private nonisolated(unsafe) let handler: (Value) -> Void
 
     nonisolated init(_ handler: @escaping (Value) -> Void) {
         self.handler = handler
